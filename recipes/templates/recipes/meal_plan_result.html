@@ -1,0 +1,323 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<header class="page-header">
+  <h1>{{ diet|title }} Meal Plan</h1>
+</header>
+
+<section class="meal-plan-section">
+  <div class="container">
+    {% if meal_plan %}
+      <div class="day-cards">
+        {% for day in meal_plan %}
+          <div class="day-card">
+            <div class="day-header">
+              <h2>Day {{ day.day }}</h2>
+            </div>
+            
+            <div class="meals-list">
+              {% for meal in day.meals %}
+                <div class="meal-item">
+                  <h3>{{ meal.Recipe_name }}</h3>
+                  <span class="cuisine-tag">{{ meal.Cuisine_type }}</span>
+                </div>
+              {% endfor %}
+            </div>
+            
+            <div class="nutrition-summary">
+              <div class="nutrient protein">
+                <div class="nutrient-icon">
+                  <i class="fas fa-drumstick-bite"></i>
+                </div>
+                <span class="nutrient-label">Protein</span>
+                <span class="nutrient-value">{{ day.summary.protein }}g</span>
+              </div>
+              <div class="nutrient carbs">
+                <div class="nutrient-icon">
+                  <i class="fas fa-bread-slice"></i>
+                </div>
+                <span class="nutrient-label">Carbs</span>
+                <span class="nutrient-value">{{ day.summary.carbs }}g</span>
+              </div>
+              <div class="nutrient fat">
+                <div class="nutrient-icon">
+                  <i class="fas fa-cheese"></i>
+                </div>
+                <span class="nutrient-label">Fat</span>
+                <span class="nutrient-value">{{ day.summary.fat }}g</span>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="empty-state">
+        <div class="empty-icon">
+          <i class="fas fa-calendar-times"></i>
+        </div>
+        <p>No meal plan available. Please try again.</p>
+      </div>
+    {% endif %}
+  </div>
+</section>
+
+<style>
+  /* Global Styles */
+  :root {
+    --primary: #3a3a3a;
+    --accent: #092289;
+    --bg: white;
+    --bg-alt: #dfd698;
+    --text: #1b1a1a;
+    --text-light: #767676;
+    --border: #eaeaea;
+    --white: #ffffff;
+    --protein: #ffa726;
+    --carbs: #66bb6a;
+    --fat: #ef5350;
+  }
+  
+  body {
+    font-family: 'Inter', sans-serif;
+    color: var(--text);
+    background-color: var(--bg);
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+  }
+  
+  .container {
+    width: 90%;
+    max-width: 1000px;
+    margin: 0 auto;
+    padding-bottom: 4rem;
+  }
+  
+  /* Page Header - Fixed at top */
+  .page-header {
+    background-color: var(--accent);
+    color: var(--white);
+    text-align: center;
+    padding: 1.5rem 0;
+    position:static;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    margin-bottom: 3rem;
+    border-radius: 15px;
+  }
+  
+  .page-header h1 {
+    font-size: 1.7rem;
+    font-weight: 300;
+    margin: 0;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  
+  /* Day Cards */
+  .day-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 2rem;
+  }
+  
+  .day-card {
+    background-color: var(--white);
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    overflow: hidden;
+    transition: all 0.4s ease;
+  }
+  
+  .day-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 15px 30px rgba(0,0,0,0.25);
+  }
+  
+  /* Day Header */
+  .day-header {
+    background-color: var(--accent);
+    color: var(--white);
+    padding: 1.2rem 1.5rem;
+  }
+  
+  .day-header h2 {
+    margin: 0;
+    font-size: 1.2rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+  
+  /* Meals List */
+  .meals-list {
+    padding: 1.8rem;
+    border-bottom: 2px solid var(--bg-alt);
+    background: linear-gradient(to bottom, rgba(255,255,255,1), rgba(238,238,238,0.3));
+  }
+  
+  .meal-item {
+    margin-bottom: 1.2rem;
+    padding-bottom: 1.2rem;
+    border-bottom: 1px dashed var(--bg-alt);
+    position: relative;
+    transition: all 0.3s ease;
+  }
+  
+  .meal-item:hover {
+    transform: translateX(5px);
+  }
+  
+  .meal-item:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+  }
+  
+  .meal-item h3 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--primary);
+  }
+  
+  .cuisine-tag {
+    display: inline-block;
+    background-color: var(--bg-alt);
+    color: var(--primary);
+    padding: 0.3rem 0.8rem;
+    border-radius: 30px;
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+  
+  /* Enhanced Nutrition Summary */
+  .nutrition-summary {
+    padding: 1rem;
+    display: flex;
+    justify-content: space-around;
+    background-color: var(--white);
+    border-top: 2px solid var(--bg-alt);
+  }
+  
+  .nutrient {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0.5rem;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+    width: 30%;
+  }
+  
+  .nutrient:hover {
+    transform: translateY(-5px);
+  }
+  
+  .nutrient.protein {
+    background-color: rgba(255, 167, 38, 0.15);
+  }
+  
+  .nutrient.carbs {
+    background-color: rgba(102, 187, 106, 0.15);
+  }
+  
+  .nutrient.fat {
+    background-color: rgba(239, 83, 80, 0.15);
+  }
+  
+  .nutrient-icon {
+    font-size: 1.8rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  .protein .nutrient-icon {
+    color: var(--protein);
+  }
+  
+  .carbs .nutrient-icon {
+    color: var(--carbs);
+  }
+  
+  .fat .nutrient-icon {
+    color: var(--fat);
+  }
+  
+  .nutrient-label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.3rem;
+  }
+  
+  .protein .nutrient-label,
+  .protein .nutrient-value {
+    color: var(--protein);
+  }
+  
+  .carbs .nutrient-label,
+  .carbs .nutrient-value {
+    color: var(--carbs);
+  }
+  
+  .fat .nutrient-label,
+  .fat .nutrient-value {
+    color: var(--fat);
+  }
+  
+  .nutrient-value {
+    font-weight: 700;
+    font-size: 1.3rem;
+  }
+  
+  /* Empty State */
+  .empty-state {
+    text-align: center;
+    padding: 5rem 0;
+    background-color: var(--white);
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+  }
+  
+  .empty-icon {
+    font-size: 4rem;
+    color: var(--accent);
+    margin-bottom: 1.5rem;
+    opacity: 0.6;
+  }
+  
+  .empty-state p {
+    font-size: 1.3rem;
+    color: var(--primary);
+    font-weight: 500;
+  }
+  
+  /* Meal Plan Section */
+  .meal-plan-section {
+    padding-top: 2rem;
+  }
+  
+  /* Responsive */
+  @media (max-width: 768px) {
+    .day-cards {
+      grid-template-columns: 1fr;
+    }
+    
+    .page-header h1 {
+      font-size: 2rem;
+    }
+    
+    .nutrition-summary {
+      flex-direction: column;
+      gap: 1rem;
+    }
+    
+    .nutrient {
+      width: 100%;
+    }
+  }
+</style>
+{% endblock %}

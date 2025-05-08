@@ -1,0 +1,506 @@
+{% extends 'base.html' %}
+
+{% block title %}Search Results - Recipe Recommender{% endblock %}
+
+{% block content %}
+<div class="card animate-fade-in mb-4">
+    <div class="card-body text-center">
+        <h1 class="card-title mb-4"><i class="fas fa-search text-primary"></i> Recipe Search</h1>
+        
+        <div class="form-group animate-fade-in">
+            <form method="get" action="{% url 'search' %}" class="mb-4">
+                <div class="search-wrapper" style="position: relative; max-width: 600px; margin: 0 auto;">
+                    <input type="text" name="q" placeholder="Search for recipes..." value="{{ query }}" class="form-control" style="padding-left: 40px;">
+                    <i class="fas fa-search" style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--gray);"></i>
+                    <button type="submit" class="btn" style="position: absolute; right: 5px; top: 50%; transform: translateY(-50%);">
+                        Search
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Recipe Search Results -->
+<div class="card animate-fade-in mb-4">
+    <div class="card-body">
+        {% if recipes %}
+            <div class="mb-4">
+                <div class="d-flex justify-content-between align-items-center" style="display: flex; justify-content: space-between; align-items: center;">
+                    <h2 class="card-title"><span class="text-primary">"{{ query }}"</span> Results</h2>
+                    <span style="background-color: var(--primary); color: white; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.9rem;">
+                        {{ recipes|length }} recipe{% if recipes|length != 1 %}s{% endif %} found
+                    </span>
+                </div>
+            </div>
+
+            <div class="grid">
+                {% for recipe in recipes %}
+                    <div class="card hover-scale" style="border-top: 4px solid var(--primary); position: relative; overflow: hidden;">
+                        {% if recipe.tags %}
+                            <div style="position: absolute; top: 0; right: 0; background-color: var(--secondary); color: white; padding: 0.2rem 0.75rem; font-size: 0.8rem; border-bottom-left-radius: 8px;">
+                                {{ recipe.tags.first.name }}
+                            </div>
+                        {% endif %}
+                        
+                        <div class="card-body">
+                            <h3 class="card-title">{{ recipe.title }}</h3>
+                            
+                            <div class="recipe-details" style="display: flex; align-items: center; margin: 1rem 0;">
+                                {% if recipe.minutes %}
+                                <div style="display: flex; align-items: center; margin-right: 1rem;">
+                                    <i class="far fa-clock text-primary" style="margin-right: 0.3rem;"></i>
+                                    <span>{{ recipe.minutes }} mins</span>
+                                </div>
+                                {% endif %}
+                                
+                                {% if recipe.difficulty %}
+                                <div style="display: flex; align-items: center; margin-right: 1rem;">
+                                    <i class="fas fa-chart-line text-secondary" style="margin-right: 0.3rem;"></i>
+                                    <span>{{ recipe.difficulty }}</span>
+                                </div>
+                                {% endif %}
+                                
+                                {% if recipe.servings %}
+                                <div style="display: flex; align-items: center;">
+                                    <i class="fas fa-users text-primary" style="margin-right: 0.3rem;"></i>
+                                    <span>{{ recipe.servings }} servings</span>
+                                </div>
+                                {% endif %}
+                            </div>
+                            
+                            {% if recipe.description %}
+                            <p class="card-text" style="margin-bottom: 1rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                                {{ recipe.description|truncatechars:100 }}
+                            </p>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="card-footer" style="display: flex; justify-content: center; border-top: 1px solid rgba(0,0,0,0.05);">
+                            <a href="{% url 'recipe_detail' recipe.id %}" class="btn" style="width: 100%; text-align: center;">
+                                View Recipe <i class="fas fa-arrow-right"></i>
+                            </a>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="text-center mb-4 animate-fade-in" style="padding: 3rem 1rem;">
+                <i class="fas fa-search" style="font-size: 3rem; color: var(--gray); margin-bottom: 1rem;"></i>
+                <h3 class="mb-2">No recipes found for "{{ query }}"</h3>
+                <p class="mb-4">Try searching with different keywords or browse our recipe categories.</p>
+                <a href="{% url 'explore' %}" class="btn">
+                    <i class="fas fa-compass"></i> Browse Categories
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Suggestions Based on User's Favorites -->
+<div class="card animate-fade-in">
+    <div class="card-body">
+        <h2 class="card-title mb-4"><i class="fas fa-lightbulb text-primary"></i> Recipe suggestions for you</h2>
+        
+        {% if suggestions %}
+            <div class="grid">
+                {% for recipe in suggestions %}
+                    <div class="card hover-scale" style="border-top: 4px solid var(--primary); position: relative; overflow: hidden;">
+                        {% if recipe.tags %}
+                            <div style="position: absolute; top: 0; right: 0; background-color: var(--secondary); color: white; padding: 0.2rem 0.75rem; font-size: 0.8rem; border-bottom-left-radius: 8px;">
+                                {{ recipe.tags.first.name }}
+                            </div>
+                        {% endif %}
+                        
+                        <div class="card-body">
+                            <h3 class="card-title">{{ recipe.title }}</h3>
+                            
+                            <div class="recipe-details" style="display: flex; align-items: center; margin: 1rem 0;">
+                                {% if recipe.minutes %}
+                                <div style="display: flex; align-items: center; margin-right: 1rem;">
+                                    <i class="far fa-clock text-primary" style="margin-right: 0.3rem;"></i>
+                                    <span>{{ recipe.minutes }} mins</span>
+                                </div>
+                                {% endif %}
+                                
+                                {% if recipe.difficulty %}
+                                <div style="display: flex; align-items: center; margin-right: 1rem;">
+                                    <i class="fas fa-chart-line text-secondary" style="margin-right: 0.3rem;"></i>
+                                    <span>{{ recipe.difficulty }}</span>
+                                </div>
+                                {% endif %}
+                                
+                                {% if recipe.servings %}
+                                <div style="display: flex; align-items: center;">
+                                    <i class="fas fa-users text-primary" style="margin-right: 0.3rem;"></i>
+                                    <span>{{ recipe.servings }} servings</span>
+                                </div>
+                                {% endif %}
+                            </div>
+                            
+                            {% if recipe.description %}
+                            <p class="card-text" style="margin-bottom: 1rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                                {{ recipe.description|truncatechars:100 }}
+                            </p>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="card-footer" style="display: flex; justify-content: center; border-top: 1px solid rgba(0,0,0,0.05);">
+                            <a href="{% url 'recipe_detail' recipe.id %}" class="btn" style="width: 100%; text-align: center;">
+                                View Recipe <i class="fas fa-arrow-right"></i>
+                            </a>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="text-center mb-4 animate-fade-in" style="padding: 2rem 1rem;">
+                <i class="far fa-lightbulb" style="font-size: 2.5rem; color: var(--gray); margin-bottom: 1rem;"></i>
+                <p>No recipe suggestions found based on your favorites yet.</p>
+                <a href="{% url 'explore' %}" class="btn btn-outline">
+                    <i class="fas fa-compass"></i> Discover Recipes
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+    // Animation for recipe cards
+    document.addEventListener('DOMContentLoaded', function() {
+        const cards = document.querySelectorAll('.card.hover-scale');
+        
+        cards.forEach((card, index) => {
+            card.style.animationDelay = `${0.1 * index}s`;
+        });
+    });
+</script>
+<style>
+    /* Recipe Recommender - Search Page Styles */
+
+    :root {
+        --primary: #3a16b0;
+        --primary-dark: #d00c40;
+        --secondary: #4ecdc4;
+        --dark: #292f36;
+        --light: #f7f9fc;
+        --gray: #767676;
+        --gray-light: #f1f3f5;
+        --transition: all 0.3s ease;
+    }
+
+    /* Search Page Specific Styles */
+    .search-wrapper {
+        position: relative;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    .search-wrapper input[type="text"] {
+        width: 100%;
+        padding: 0.75rem 1rem 0.75rem 3rem;
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        border-radius: 50px;
+        font-family: 'Poppins', sans-serif;
+        font-size: 1rem;
+        transition: var(--transition);
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    .search-wrapper input[type="text"]:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(58, 22, 176, 0.25);
+    }
+
+    .search-wrapper i.fas.fa-search {
+        position: absolute;
+        left: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--gray);
+        font-size: 1.2rem;
+    }
+
+    .search-wrapper button[type="submit"] {
+        position: absolute;
+        right: 5px;
+        top: 50%;
+        transform: translateY(-50%);
+        background-color: var(--primary);
+        color: white;
+        border: none;
+        border-radius: 50px;
+        padding: 0.5rem 1.25rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: var(--transition);
+    }
+
+    .search-wrapper button[type="submit"]:hover {
+        background-color: var(--primary-dark);
+        transform: translateY(-50%) scale(1.05);
+    }
+
+    /* Results Counter Badge */
+    .results-counter {
+        background-color: var(--primary);
+        color: white;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        font-weight: 500;
+    }
+
+    /* Recipe Cards */
+    .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 1.5rem;
+        margin-top: 2rem;
+    }
+
+    .card {
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+        overflow: hidden;
+        transition: var(--transition);
+        position: relative;
+        border-top: 4px solid var(--primary);
+    }
+
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 25px rgba(0, 0, 0, 0.12);
+    }
+
+    .card-body {
+        padding: 1.5rem;
+    }
+
+    .card-title {
+        font-size: 1.25rem;
+        margin-bottom: 1rem;
+        color: var(--dark);
+        font-weight: 600;
+    }
+
+    .card-text {
+        color: var(--gray);
+        margin-bottom: 1rem;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        line-height: 1.5;
+    }
+
+    .recipe-details {
+        display: flex;
+        align-items: center;
+        margin: 1rem 0;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .recipe-details > div {
+        display: flex;
+        align-items: center;
+        margin-right: 1rem;
+        background-color: var(--light);
+        padding: 0.35rem 0.75rem;
+        border-radius: 30px;
+        font-size: 0.85rem;
+    }
+
+    .recipe-details i {
+        margin-right: 0.3rem;
+        color: var(--primary);
+    }
+
+    .recipe-tag {
+        position: absolute;
+        top: 0;
+        right: 0;
+        background-color: var(--secondary);
+        color: white;
+        padding: 0.2rem 0.75rem;
+        font-size: 0.8rem;
+        border-bottom-left-radius: 8px;
+        font-weight: 500;
+    }
+
+    .card-footer {
+        padding: 1rem;
+        background-color: rgba(0, 0, 0, 0.02);
+        border-top: 1px solid rgba(0, 0, 0, 0.05);
+        display: flex;
+        justify-content: center;
+    }
+
+    .card-footer a {
+        width: 100%;
+        text-align: center;
+        padding: 0.5rem 1rem;
+        background-color: transparent;
+        color: var(--primary);
+        border: 1px solid var(--primary);
+        border-radius: 4px;
+        font-weight: 500;
+        transition: var(--transition);
+        text-decoration: none;
+        display: inline-block;
+    }
+
+    .card-footer a:hover {
+        background-color: var(--primary);
+        color: white;
+        transform: translateY(-2px);
+    }
+
+    .card-footer a i {
+        margin-left: 0.5rem;
+        transition: transform 0.2s ease;
+    }
+
+    .card-footer a:hover i {
+        transform: translateX(3px);
+    }
+
+    /* No Results Found */
+    .no-results {
+        text-align: center;
+        padding: 3rem 1rem;
+    }
+
+    .no-results i {
+        font-size: 3rem;
+        color: var(--gray);
+        margin-bottom: 1rem;
+        opacity: 0.5;
+    }
+
+    .no-results h3 {
+        margin-bottom: 0.5rem;
+        color: var(--dark);
+    }
+
+    .no-results p {
+        color: var(--gray);
+        margin-bottom: 1.5rem;
+    }
+
+    /* Suggestions Section */
+    .suggestions-heading {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1.5rem;
+    }
+
+    .suggestions-heading i {
+        margin-right: 0.75rem;
+        color: var(--primary);
+        font-size: 1.5rem;
+    }
+
+    /* Animation Delays for Grid Items */
+    .grid .card:nth-child(1) { animation-delay: 0.1s; }
+    .grid .card:nth-child(2) { animation-delay: 0.2s; }
+    .grid .card:nth-child(3) { animation-delay: 0.3s; }
+    .grid .card:nth-child(4) { animation-delay: 0.4s; }
+    .grid .card:nth-child(5) { animation-delay: 0.5s; }
+    .grid .card:nth-child(6) { animation-delay: 0.6s; }
+
+    /* Search Animation */
+    @keyframes pulse {
+        0% { box-shadow: 0 0 0 0 rgba(58, 22, 176, 0.4); }
+        70% { box-shadow: 0 0 0 10px rgba(58, 22, 176, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(58, 22, 176, 0); }
+    }
+
+    .search-animation {
+        animation: pulse 2s infinite;
+    }
+
+    /* Difficulty Level Indicators */
+    .recipe-details .difficulty-easy {
+        color: #52b788;
+    }
+
+    .recipe-details .difficulty-medium {
+        color: #ff9e00;
+    }
+
+    .recipe-details .difficulty-hard {
+        color: #ef476f;
+    }
+
+    /* Responsive Adjustments */
+    @media (max-width: 768px) {
+        .grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .recipe-details {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        
+        .recipe-details > div {
+            margin-bottom: 0.5rem;
+        }
+        
+        .search-wrapper button[type="submit"] {
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+        }
+    }
+
+    /* Loading States */
+    .loading-spinner {
+        width: 40px;
+        height: 40px;
+        border: 4px solid rgba(58, 22, 176, 0.3);
+        border-radius: 50%;
+        border-top-color: var(--primary);
+        animation: spin 1s linear infinite;
+        margin: 2rem auto;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    /* Search History Tags */
+    .search-history {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin: 1rem 0;
+    }
+
+    .search-tag {
+        background-color: rgba(58, 22, 176, 0.1);
+        color: var(--primary);
+        padding: 0.35rem 0.75rem;
+        border-radius: 30px;
+        font-size: 0.85rem;
+        cursor: pointer;
+        transition: var(--transition);
+        display: flex;
+        align-items: center;
+    }
+
+    .search-tag:hover {
+        background-color: var(--primary);
+        color: white;
+    }
+
+    .search-tag i {
+        margin-right: 0.4rem;
+        font-size: 0.8rem;
+    }
+</style>
+{% endblock %}

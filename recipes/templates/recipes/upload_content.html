@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block title %}Upload Content{% endblock %}
+
+{% block content %}
+<header class="page-header">
+  <div class="container">
+    <h1>Upload New Recipe</h1>
+  </div>
+</header>
+
+<section class="upload-section">
+  <div class="container">
+    <form method="POST" enctype="multipart/form-data" class="upload-form">
+      {% csrf_token %}
+
+      <div class="form-group">
+        <label for="{{ form.title.id_for_label }}">Recipe Title:</label>
+        {{ form.title }}
+      </div>
+
+      <div class="form-group">
+        <label for="{{ form.description.id_for_label }}">Description:</label>
+        {{ form.description }}
+      </div>
+
+      <div class="form-group">
+        <label for="{{ form.ingredients.id_for_label }}">Ingredients:</label>
+        {{ form.ingredients }}
+        <p class="help-text">List ingredients separated by commas or line breaks.</p>
+      </div>
+
+      <div class="form-group">
+        <label for="{{ form.steps.id_for_label }}">Preparation Steps:</label>
+        {{ form.steps }}
+        <p class="help-text">Write clear step-by-step cooking instructions.</p>
+      </div>
+
+      <div class="form-group">
+        <label for="{{ form.image.id_for_label }}">Image (optional):</label>
+        {{ form.image }}
+      </div>
+
+      <button type="submit" class="upload-button">Upload Recipe</button>
+    </form>
+  </div>
+</section>
+{% endblock %}

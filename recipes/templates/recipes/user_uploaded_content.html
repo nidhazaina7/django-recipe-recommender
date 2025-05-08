@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% block title %}My Uploaded Recipes{% endblock %}
+
+{% block content %}
+<section class="my-uploads">
+  <div class="container">
+    <h1>My Uploaded Recipes</h1>
+    <a href="{% url 'upload_content' %}" class="btn btn-primary">Upload New Recipe</a>
+    <div class="recipe-grid">
+      {% for item in contents %}
+        <div class="recipe-card">
+          <img src="{{ item.image.url }}" alt="{{ item.title }}" class="resized-image">
+          <h3>{{ item.title }}</h3>
+          <p>{{ item.description|truncatewords:20 }}</p>
+          <a href="{% url 'edit_content' item.id %}">Edit</a> |
+          <a href="{% url 'delete_content' item.id %}">Delete</a> |
+          <a href="{% url 'content_details' item.id %}">View</a>
+        </div>
+      {% empty %}
+        <p>You haven't uploaded any content yet.</p>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<style>
+  .recipe-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+  }
+
+  .recipe-card {
+    text-align: center;
+    margin: 15px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    width: 200px;
+  }
+
+  .resized-image {
+    width: 150px;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+  }
+</style>
+{% endblock %}

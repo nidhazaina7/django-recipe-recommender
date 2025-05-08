@@ -1,0 +1,26 @@
+<!-- templates/recipes/mood2meal.html -->
+
+{% extends "base.html" %}
+
+{% block title %}Mood2Meal{% endblock %}
+
+{% block content %}
+    <h2>Find a Meal Based on Your Mood</h2>
+
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Find Recipe</button>
+    </form>
+
+    {% if recipes %}
+        <h3>Recommended Recipes:</h3>
+        <ul>
+            {% for recipe in recipes %}
+                <li><a href="{% url 'recipe_detail' recipe.id %}">{{ recipe.title }}</a></li>
+            {% empty %}
+                <li>No matching recipes found.</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+{% endblock %}

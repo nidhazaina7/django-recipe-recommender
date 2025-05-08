@@ -1,0 +1,257 @@
+{% extends 'base.html' %}
+{% block title %}Explore Recipes{% endblock %}
+
+{% block content %}
+<section class="explore-section">
+    <div class="explore-header mb-4">
+        <h1 class="text-center mb-2">Explore <span class="text-primary">Recipes</span></h1>
+        <p class="text-center text-gray mb-3">Discover delicious recipes from our community and professional chefs</p>
+    </div>
+
+    <div class="recipe-grid">
+        {% for item in contents %}
+            <div class="recipe-card card">
+                <div class="card-img-container">
+                    <img src="{{ item.image.url }}" alt="{{ item.title }}" class="card-img">
+                </div>
+                <div class="card-body">
+                    <h3 class="card-title">{{ item.title }}</h3>
+                    <p class="card-text">{{ item.description|truncatewords:15 }}</p>
+                </div>
+                <div class="card-footer d-flex justify-content-between align-items-center">
+                    <a href="{% url 'content_details' item.id %}" class="btn btn-sm">View Recipe</a>
+                    <div class="likes-info d-flex align-items-center">
+                        <i class="{% if user in item.likes.all %}fas{% else %}far{% endif %} fa-heart"></i>
+                        <span class="ml-2">{{ item.likes.count }} likes</span>
+                    </div>
+                </div>
+                
+            </div>
+        {% empty %}
+            <div class="empty-state">
+                <i class="fas fa-utensils fa-3x mb-3 text-gray"></i>
+                <h3>No Recipes Yet</h3>
+                <p>Be the first to contribute by adding your favorite recipe!</p>
+                <a href="#" class="btn btn-outline mt-3">Add Recipe</a>
+            </div>
+        {% endfor %}
+    </div>
+
+    {% if contents %}
+    <div class="pagination-container text-center mt-4">
+        <div class="pagination">
+            <a href="#" class="pagination-arrow"><i class="fas fa-chevron-left"></i></a>
+            <a href="#" class="pagination-number active">1</a>
+            <a href="#" class="pagination-number">2</a>
+            <a href="#" class="pagination-number">3</a>
+            <span class="pagination-dots">...</span>
+            <a href="#" class="pagination-number">9</a>
+            <a href="#" class="pagination-arrow"><i class="fas fa-chevron-right"></i></a>
+        </div>
+    </div>
+    {% endif %}
+</section>
+
+<style>
+    /* Explore Page Styles */
+    .explore-section {
+        animation: fadeIn 0.8s ease;
+    }
+    
+    .explore-header h1 {
+        font-size: 2.5rem;
+        font-weight: 700;
+    }
+    
+    .text-gray {
+        color: var(--gray);
+    }
+    
+   
+    
+    /* Recipe Grid */
+    .recipe-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 1.5rem;
+    }
+    
+    /* Recipe Card */
+    .recipe-card {
+        border-radius: 10px;
+        overflow: hidden;
+        transition: var(--transition);
+        height: 100%;
+    }
+    
+    .recipe-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    }
+    
+    .card-img-container {
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .card-img {
+        height: 200px;
+        width: 100%;
+        object-fit: cover;
+        transition: transform 0.5s ease;
+    }
+    
+    .recipe-card:hover .card-img {
+        transform: scale(1.05);
+    }
+    
+    .favorite-btn {
+        background: none;
+        border: none;
+        font-size: 1.2rem;
+        color: var(--gray);
+        cursor: pointer;
+        transition: var(--transition);
+    }
+    
+    .favorite-btn:hover {
+        color: #d00c40;
+        transform: scale(1.1);
+    }
+    
+    .favorite-btn.active {
+        color: #d00c40;
+    }
+    
+    /* Empty State */
+    .empty-state {
+        grid-column: 1 / -1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 3rem;
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    }
+    
+    /* Pagination */
+    .pagination-container {
+        margin-top: 2rem;
+    }
+    
+    .pagination {
+        display: inline-flex;
+        background-color: white;
+        padding: 0.5rem;
+        border-radius: 50px;
+        box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+    }
+    
+    .pagination-number,
+    .pagination-arrow,
+    .pagination-dots {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        height: 36px;
+        margin: 0 0.25rem;
+        border-radius: 50%;
+        transition: var(--transition);
+        color: var(--dark);
+        text-decoration: none;
+    }
+    
+    .pagination-number:hover,
+    .pagination-arrow:hover {
+        background-color: rgba(0, 0, 0, 0.05);
+    }
+    
+    .pagination-number.active {
+        background-color: var(--primary);
+        color: white;
+    }
+    
+    /* Responsive Adjustments */
+    @media (max-width: 768px) {
+        .explore-header h1 {
+            font-size: 2rem;
+        }
+        
+        .filter-tags {
+            justify-content: center;
+        }
+    }
+    
+    /* Animation for cards */
+    .recipe-card {
+        opacity: 0;
+        animation: cardFadeIn 0.5s ease forwards;
+    }
+    
+    @keyframes cardFadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    /* Staggered animation for cards */
+    .recipe-card:nth-child(1) { animation-delay: 0.1s; }
+    .recipe-card:nth-child(2) { animation-delay: 0.2s; }
+    .recipe-card:nth-child(3) { animation-delay: 0.3s; }
+    .recipe-card:nth-child(4) { animation-delay: 0.4s; }
+    .recipe-card:nth-child(5) { animation-delay: 0.5s; }
+    .recipe-card:nth-child(6) { animation-delay: 0.6s; }
+    .recipe-card:nth-child(7) { animation-delay: 0.7s; }
+    .recipe-card:nth-child(8) { animation-delay: 0.8s; }
+    
+    /* Utility class */
+    .mt-3 {
+        margin-top: 1.5rem;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Filter tag functionality
+        const filterTags = document.querySelectorAll('.filter-tag');
+        
+        filterTags.forEach(tag => {
+            tag.addEventListener('click', function() {
+                filterTags.forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                
+                // Here you would add the actual filtering logic
+                // For now, we'll just simulate with a visual effect
+                const recipeCards = document.querySelectorAll('.recipe-card');
+                recipeCards.forEach(card => {
+                    card.style.opacity = '0';
+                    setTimeout(() => {
+                        card.style.opacity = '1';
+                    }, 300);
+                });
+            });
+        });
+        
+        // Favorite button functionality
+        const favoriteButtons = document.querySelectorAll('.favorite-btn');
+        
+        favoriteButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const icon = this.querySelector('i');
+                if (icon.classList.contains('far')) {
+                    icon.classList.remove('far');
+                    icon.classList.add('fas');
+                    this.classList.add('active');
+                } else {
+                    icon.classList.remove('fas');
+                    icon.classList.add('far');
+                    this.classList.remove('active');
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

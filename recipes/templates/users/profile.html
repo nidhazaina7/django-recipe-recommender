@@ -1,0 +1,557 @@
+{% extends "base.html" %}
+
+{% block title %}Your Profile{% endblock %}
+
+{% block content %}
+<div class="profile-container">
+    <div class="profile-header">
+        <div class="profile-avatar-container">
+            {% if user.userprofile.profile_picture %}
+                <img src="{{ user.userprofile.profile_picture.url }}" alt="Profile Picture" class="profile-avatar">
+            {% else %}
+                <div class="profile-avatar-placeholder">
+                    <i class="fas fa-user"></i>
+                </div>
+            {% endif %}
+            <div class="profile-upload-overlay" id="uploadOverlay">
+                <i class="fas fa-camera"></i>
+                <span>Update Photo</span>
+            </div>
+        </div>
+        <div class="profile-title">
+            <h1>Welcome, {{ user.username }}!</h1>
+            <p class="text-gray">Manage your profile and preferences</p>
+        </div>
+    </div>
+
+    <div class="profile-nav">
+        <button class="profile-tab active" data-tab="account">
+            <i class="fas fa-user"></i> Account
+        </button>
+        <button class="profile-tab" data-tab="favorites">
+            <i class="fas fa-heart"></i> Favorites
+        </button>
+        <button class="profile-tab" data-tab="preferences">
+            <i class="fas fa-sliders-h"></i> Preferences
+        </button>
+        <button class="profile-tab" data-tab="content">
+            <i class="fas fa-book-open"></i> My Recipes
+        </button>
+    </div>
+
+    <div class="profile-content">
+        <!-- Account Tab -->
+        <div class="profile-tab-content active" id="account-tab">
+            <div class="card">
+                <div class="card-body">
+                    <h2 class="card-title">Profile Information</h2>
+                    <form method="post" class="profile-form">
+                        {% csrf_token %}
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="{{ user_form.username.id_for_label }}">Username</label>
+                                {{ user_form.username }}
+                            </div>
+                            <div class="form-group">
+                                <label for="{{ user_form.email.id_for_label }}">Email Address</label>
+                                {{ user_form.email }}
+                            </div>
+                        </div>
+                        <button type="submit" name="update_info" class="btn">
+                            <i class="fas fa-save"></i> Save Changes
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card mt-4">
+                <div class="card-body">
+                    <h2 class="card-title">Profile Picture</h2>
+                    <form method="post" enctype="multipart/form-data" class="profile-form" id="photoForm">
+                        {% csrf_token %}
+                        <div class="file-upload-container">
+                            <label for="{{ picture_form.profile_picture.id_for_label }}" class="file-upload-label">
+                                <i class="fas fa-upload"></i>
+                                <span>Choose a file</span>
+                            </label>
+                            {{ picture_form.profile_picture }}
+                            <div class="file-name" id="fileName">No file chosen</div>
+                        </div>
+                        <button type="submit" name="update_picture" class="btn">
+                            <i class="fas fa-cloud-upload-alt"></i> Upload Photo
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Favorites Tab -->
+        <div class="profile-tab-content" id="favorites-tab">
+            <div class="card">
+                <div class="card-body">
+                    <h2 class="card-title">Your Favorite Recipes</h2>
+                    {% if favorite_recipes %}
+                        <div class="favorite-recipes-grid">
+                            {% for recipe in favorite_recipes %}
+                                <div class="favorite-recipe-card">
+                                    {% if recipe.image %}
+                                        <div class="favorite-recipe-img" style="background-image: url('{{ recipe.image.url }}')"></div>
+                                    {% else %}
+                                        <div class="favorite-recipe-img">
+                                            <i class="fas fa-utensils"></i>
+                                        </div>
+                                    {% endif %}
+                                    <div class="favorite-recipe-content">
+                                        <h3><a href="{% url 'recipe_detail' recipe.id %}">{{ recipe.title }}</a></h3>
+                                        <div class="favorite-recipe-meta">
+                                            <span><i class="fas fa-clock"></i> {{ recipe.cooking_time }} mins</span>
+                                            <span><i class="fas fa-utensil-spoon"></i> {{ recipe.get_difficulty_display }}</span>
+                                        </div>
+                                        <a href="{% url 'recipe_detail' recipe.id %}" class="btn btn-sm">
+                                            <i class="fas fa-eye"></i> View Recipe
+                                        </a>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="empty-state">
+                            <i class="fas fa-heart-broken"></i>
+                            <h3>No Favorites Yet</h3>
+                            <p>You haven't added any favorite recipes. Start exploring and save recipes you love!</p>
+                            <a href="{% url 'explore' %}" class="btn">
+                                <i class="fas fa-compass"></i> Explore Recipes
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Preferences Tab -->
+        <div class="profile-tab-content" id="preferences-tab">
+            <div class="card">
+                <div class="card-body">
+                    <h2 class="card-title">Your Cooking Preferences</h2>
+                    <form method="post" class="profile-form">
+                        {% csrf_token %}
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="{{ preferences_form.diet.id_for_label }}">Diet</label>
+                                {{ preferences_form.diet }}
+                            </div>
+                            <div class="form-group">
+                                <label for="{{ preferences_form.favorite_cuisine.id_for_label }}">Favorite Cuisine</label>
+                                {{ preferences_form.favorite_cuisine }}
+                            </div>
+                            <div class="form-group">
+                                <label for="{{ preferences_form.skill_level.id_for_label }}">Cooking Skill Level</label>
+                                {{ preferences_form.skill_level }}
+                            </div>
+                            <div class="form-group">
+                                <label for="{{ preferences_form.allergies.id_for_label }}">Allergies</label>
+                                {{ preferences_form.allergies }}
+                            </div>
+                        </div>
+                        <button type="submit" name="update_preferences" class="btn">
+                            <i class="fas fa-save"></i> Save Preferences
+                        </button>
+                    </form>
+                    
+                    {% if preferences %}
+                        <div class="preferences-summary">
+                            <h3>Current Preferences</h3>
+                            <div class="preferences-badges">
+                                <span class="badge"><i class="fas fa-utensils"></i> {{ preferences.get_diet_display }}</span>
+                                <span class="badge"><i class="fas fa-globe-americas"></i> {{ preferences.get_favorite_cuisine_display }}</span>
+                                <span class="badge"><i class="fas fa-chart-line"></i> {{ preferences.get_skill_level_display }}</span>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Content Tab -->
+        <div class="profile-tab-content" id="content-tab">
+            <div class="card">
+                <div class="card-body">
+                    <h2 class="card-title">My Recipes</h2>
+                    <div class="content-actions">
+                        <a href="{% url 'upload_content' %}" class="btn">
+                            <i class="fas fa-plus"></i> Add New Recipe
+                        </a>
+                    </div>
+                    
+                    <div class="my-recipes">
+                        <a href="{% url 'user_uploaded_content' %}" class="btn btn-outline">
+                            <i class="fas fa-book"></i> View All My Recipes
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Profile Page Specific Styles */
+    .profile-container {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 1rem;
+    }
+
+    .profile-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 2rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 1px solid #eee;
+    }
+
+    .profile-avatar-container {
+        position: relative;
+        width: 120px;
+        height: 120px;
+        margin-right: 2rem;
+        border-radius: 50%;
+        overflow: hidden;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .profile-avatar {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .profile-avatar-placeholder {
+        width: 100%;
+        height: 100%;
+        background-color: #f0f0f0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 3rem;
+        color: #ccc;
+    }
+
+    .profile-upload-overlay {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        padding: 0.5rem 0;
+        background-color: rgba(0, 0, 0, 0.6);
+        color: white;
+        text-align: center;
+        font-size: 0.8rem;
+        transform: translateY(100%);
+        transition: transform 0.3s ease;
+        cursor: pointer;
+    }
+
+    .profile-avatar-container:hover .profile-upload-overlay {
+        transform: translateY(0);
+    }
+
+    .profile-title {
+        flex: 1;
+    }
+
+    .profile-title h1 {
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+        color: var(--dark);
+    }
+
+    .text-gray {
+        color: var(--gray);
+    }
+
+    .profile-nav {
+        display: flex;
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        margin-bottom: 2rem;
+        overflow: hidden;
+    }
+
+    .profile-tab {
+        flex: 1;
+        padding: 1rem;
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-family: 'Poppins', sans-serif;
+        font-weight: 500;
+        color: var(--gray);
+        transition: var(--transition);
+        border-bottom: 3px solid transparent;
+    }
+
+    .profile-tab:hover {
+        color: var(--primary);
+        background-color: rgba(58, 22, 176, 0.05);
+    }
+
+    .profile-tab.active {
+        color: var(--primary);
+        border-bottom-color: var(--primary);
+        background-color: rgba(58, 22, 176, 0.05);
+    }
+
+    .profile-tab i {
+        margin-right: 0.5rem;
+    }
+
+    .profile-tab-content {
+        display: none;
+    }
+
+    .profile-tab-content.active {
+        display: block;
+        animation: fadeIn 0.5s ease;
+    }
+
+    .profile-form {
+        margin-top: 1.5rem;
+    }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+
+    @media (min-width: 768px) {
+        .form-grid {
+            grid-template-columns: 1fr 1fr;
+        }
+    }
+
+    .file-upload-container {
+        margin-bottom: 1rem;
+    }
+
+    .file-upload-label {
+        display: inline-block;
+        padding: 0.75rem 1.5rem;
+        background-color: #f7f7f7;
+        border: 1px dashed #ddd;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: var(--transition);
+    }
+
+    .file-upload-label:hover {
+        background-color: #f0f0f0;
+        border-color: var(--primary);
+    }
+
+    .file-upload-label i {
+        margin-right: 0.5rem;
+    }
+
+    input[type="file"] {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        border: 0;
+    }
+
+    .file-name {
+        display: inline-block;
+        margin-left: 1rem;
+        font-size: 0.9rem;
+        color: var(--gray);
+    }
+
+    .favorite-recipes-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-top: 1.5rem;
+    }
+
+    .favorite-recipe-card {
+        background-color: white;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        transition: var(--transition);
+    }
+
+    .favorite-recipe-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    }
+
+    .favorite-recipe-img {
+        height: 150px;
+        background-color: #f5f5f5;
+        background-size: cover;
+        background-position: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #ccc;
+        font-size: 2rem;
+    }
+
+    .favorite-recipe-content {
+        padding: 1rem;
+    }
+
+    .favorite-recipe-content h3 {
+        font-size: 1.1rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .favorite-recipe-content h3 a {
+        color: var(--dark);
+        text-decoration: none;
+        transition: var(--transition);
+    }
+
+    .favorite-recipe-content h3 a:hover {
+        color: var(--primary);
+    }
+
+    .favorite-recipe-meta {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 1rem;
+        font-size: 0.85rem;
+        color: var(--gray);
+    }
+
+    .favorite-recipe-meta span i {
+        margin-right: 0.25rem;
+    }
+
+    .preferences-summary {
+        margin-top: 2rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid #eee;
+    }
+
+    .preferences-badges {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-top: 1rem;
+    }
+
+    .badge {
+        display: inline-block;
+        padding: 0.5rem 1rem;
+        background-color: rgba(58, 22, 176, 0.1);
+        color: var(--primary);
+        border-radius: 30px;
+        font-size: 0.85rem;
+    }
+
+    .badge i {
+        margin-right: 0.5rem;
+    }
+
+    .content-actions {
+        margin-bottom: 1.5rem;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 3rem 1rem;
+        color: var(--gray);
+    }
+
+    .empty-state i {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        color: #ddd;
+    }
+
+    .empty-state h3 {
+        margin-bottom: 0.5rem;
+        color: var(--dark);
+    }
+
+    .empty-state p {
+        margin-bottom: 1.5rem;
+    }
+
+    .my-recipes {
+        margin-top: 1.5rem;
+    }
+
+    .btn-outline {
+        background-color: transparent;
+        color: var(--primary);
+        border: 1px solid var(--primary);
+    }
+
+    .btn-outline:hover {
+        background-color: var(--primary);
+        color: white;
+    }
+
+    .mt-4 {
+        margin-top: 2rem;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Tab Navigation
+        const tabs = document.querySelectorAll('.profile-tab');
+        const tabContents = document.querySelectorAll('.profile-tab-content');
+        
+        tabs.forEach(tab => {
+            tab.addEventListener('click', function() {
+                const tabId = this.getAttribute('data-tab');
+                
+                // Remove active class from all tabs and contents
+                tabs.forEach(t => t.classList.remove('active'));
+                tabContents.forEach(c => c.classList.remove('active'));
+                
+                // Add active class to current tab and content
+                this.classList.add('active');
+                document.getElementById(tabId + '-tab').classList.add('active');
+            });
+        });
+        
+        // File upload display
+        const fileInput = document.querySelector('input[type="file"]');
+        const fileName = document.getElementById('fileName');
+        const uploadOverlay = document.getElementById('uploadOverlay');
+        
+        if (fileInput && fileName) {
+            fileInput.addEventListener('change', function() {
+                if (this.files.length > 0) {
+                    fileName.textContent = this.files[0].name;
+                } else {
+                    fileName.textContent = 'No file chosen';
+                }
+            });
+        }
+        
+        if (uploadOverlay && fileInput) {
+            uploadOverlay.addEventListener('click', function() {
+                fileInput.click();
+            });
+        }
+    });
+</script>
+{% endblock %}

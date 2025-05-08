@@ -1,0 +1,468 @@
+{% extends 'base.html' %}
+
+{% block title %}AI-based & Mood-based Recipe Recommendations{% endblock %}
+
+{% block content %}
+    <div class="recommendation-container animate-fade-in">
+        <div class="section-header text-center mb-4">
+            <h1 class="mb-2">Smart Recipe Recommendations</h1>
+            <p class="text-gray">Discover delicious recipes tailored just for you</p>
+            <p class="text-gray help-text">Click on a feature to begin</p>
+        </div>
+
+        <div class="recommendation-cards">
+            <!-- AI-based Ingredient Search Card -->
+            <div class="card recommendation-card" id="ingredients-card" data-feature="ingredients">
+                <div class="card-header">
+                    <div class="card-icon">
+                        <i class="fas fa-carrot text-primary"></i>
+                    </div>
+                    <h2 class="card-title">Recipes by Ingredients</h2>
+                    <div class="card-toggle">
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                </div>
+                
+                <div class="card-content" style="display: none;">
+                    <p class="card-text mb-3">Tell us what's in your kitchen, and we'll suggest delicious recipes you can make.</p>
+                    
+                    <form method="get" action="{% url 'recommendations' %}" class="ingredient-form">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <input type="text" name="ingredients" id="ingredients" class="form-control" placeholder="e.g., chicken, rice, garlic" value="{{ ingredient_query }}">
+                                <button type="submit" class="btn">
+                                    <i class="fas fa-search"></i> Find Recipes
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                    
+                    {% if ai_recipes %}
+                        <div class="results-container mt-4">
+                            <h3 class="results-title mb-2">
+                                <i class="fas fa-utensils"></i> Recommended Recipes
+                            </h3>
+                            <div class="recipe-results">
+                                {% for recipe in ai_recipes %}
+                                    <div class="recipe-item">
+                                        <a href="{% url 'recipe_detail' recipe.id %}" class="recipe-link">
+                                            <span class="recipe-name">{{ recipe.title }}</span>
+                                            <i class="fas fa-chevron-right"></i>
+                                        </a>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% elif ingredient_query %}
+                        <div class="no-results mt-4">
+                            <p>No recommendations found for: <strong>{{ ingredient_query }}</strong></p>
+                            <p class="suggestion">Try different ingredients or check our <a href="{% url 'search' %}">Recipe Finder</a>.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Mood2Meal Card -->
+            <div class="card recommendation-card" id="mood-card" data-feature="mood">
+                <div class="card-header">
+                    <div class="card-icon">
+                        <i class="fas fa-smile text-primary"></i>
+                    </div>
+                    <h2 class="card-title">Mood2Meal</h2>
+                    <div class="card-toggle">
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                </div>
+                
+                <div class="card-content" style="display: none;">
+                    <p class="card-text mb-3">Let your feelings guide your food choices. We'll match your mood to the perfect meal.</p>
+                    
+                    <form method="post" action="{% url 'recommendations' %}" class="mood-form">
+                        {% csrf_token %}
+                        <div class="mood-form-fields">
+                            {{ mood_form.as_p }}
+                        </div>
+                        <button type="submit" class="btn btn-block">
+                            <i class="fas fa-heart"></i> Find My Mood Food
+                        </button>
+                    </form>
+                    
+                    {% if mood_recipes %}
+                        <div class="results-container mt-4">
+                            <h3 class="results-title mb-2">
+                                <i class="fas fa-grin-stars"></i> Mood-Based Recommendations
+                            </h3>
+                            <div class="recipe-results">
+                                {% for recipe in mood_recipes %}
+                                    <div class="recipe-item">
+                                        <a href="{% url 'recipe_detail' recipe.id %}" class="recipe-link">
+                                            <span class="recipe-name">{{ recipe.title }}</span>
+                                            <i class="fas fa-chevron-right"></i>
+                                        </a>
+                                    </div>
+                                {% empty %}
+                                    <div class="no-results">
+                                        <p>No matching recipes found for your mood.</p>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="recommendation-tips">
+            <div class="tip-card">
+                <div class="tip-icon">
+                    <i class="fas fa-lightbulb"></i>
+                </div>
+                <div class="tip-content">
+                    <h3>Pro Tip</h3>
+                    <p>For the best recommendations, include at least 3-5 ingredients you'd like to use.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        /* Recommendations Page Specific Styles */
+        .recommendation-container {
+            padding: 2rem 0;
+        }
+        
+        .section-header h1 {
+            font-size: 2.2rem;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        .text-gray {
+            color: var(--gray);
+        }
+        
+        .help-text {
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+            color: var(--primary);
+            font-weight: 500;
+        }
+        
+        .recommendation-cards {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            width: 900px;
+            padding-left: 250px;
+            
+        }
+        
+        /* Removed the media query that changed to 2 columns */
+        
+        .recommendation-card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
+            transition: all 0.3s ease;
+            overflow: hidden;
+            cursor: pointer;
+        }
+        
+        .recommendation-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+        }
+        
+        .recommendation-card.active {
+            box-shadow: 0 15px 35px rgba(82, 179, 209, 0.15);
+            border-left: 3px solid var(--primary);
+        }
+        
+        .card-header {
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: white;
+            transition: all 0.3s ease;
+        }
+        
+        .card-header:hover {
+            background-color: rgba(247, 249, 252, 0.5);
+        }
+        
+        .card-icon {
+            font-size: 1.8rem;
+            color: var(--primary);
+            margin-right: 1rem;
+        }
+        
+        .card-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin: 0;
+            flex: 1;
+        }
+        
+        .card-toggle {
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background-color: rgba(82, 179, 209, 0.1);
+            color: var(--primary);
+            transition: all 0.3s ease;
+        }
+        
+        .recommendation-card.active .card-toggle {
+            transform: rotate(180deg);
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .card-content {
+            padding: 0 1.5rem 1.5rem 1.5rem;
+            animation: fadeDown 0.4s ease forwards;
+            opacity: 0;
+        }
+        
+        @keyframes fadeDown {
+            from { opacity: 0; transform: translateY(-15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .card-text {
+            color: var(--gray);
+            margin-bottom: 1.5rem;
+        }
+        
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        @media (min-width: 576px) {
+            .input-group {
+                flex-direction: row;
+            }
+        }
+        
+        .form-control {
+            padding: 0.75rem 1rem;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            flex-grow: 1;
+            transition: all 0.2s ease;
+        }
+        
+        .form-control:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(82, 179, 209, 0.2);
+        }
+        
+        .btn {
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            letter-spacing: 0.02em;
+            border-radius: 8px;
+        }
+        
+        .btn-block {
+            width: 100%;
+            display: block;
+            margin-top: 1rem;
+        }
+        
+        .mood-form-fields {
+            margin-bottom: 1rem;
+        }
+        
+        .mood-form-fields p {
+            margin-bottom: 1rem;
+        }
+        
+        .mood-form-fields label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--dark);
+        }
+        
+        .mood-form-fields select {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            background-color: white;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.2s ease;
+        }
+        
+        .mood-form-fields select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(82, 179, 209, 0.2);
+            outline: none;
+        }
+        
+        .results-container {
+            background-color: rgba(247, 249, 252, 0.7);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-top: 2rem;
+        }
+        
+        .results-title {
+            font-size: 1.2rem;
+            color: var(--dark);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .recipe-results {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .recipe-item {
+            background-color: white;
+            padding: 0.75rem 1rem;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+            border-left: 3px solid var(--primary);
+        }
+        
+        .recipe-item:hover {
+            background-color: var(--light);
+            transform: translateX(5px);
+        }
+        
+        .recipe-link {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            text-decoration: none;
+            color: var(--dark);
+        }
+        
+        .recipe-name {
+            font-weight: 500;
+        }
+        
+        .no-results {
+            text-align: center;
+            padding: 1.5rem;
+            color: var(--gray);
+        }
+        
+        .suggestion {
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+        }
+        
+        .recommendation-tips {
+            margin-top: 3rem;
+        }
+        
+        .tip-card {
+            background-color: #f0f7ff;
+            border-radius: 12px;
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+        }
+        
+        .tip-icon {
+            font-size: 2rem;
+            color: #ffc107;
+        }
+        
+        .tip-content h3 {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+            color: var(--dark);
+        }
+        
+        .tip-content p {
+            color: var(--gray);
+            margin: 0;
+        }
+        
+        .mt-4 {
+            margin-top: 2rem;
+        }
+    </style>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const cards = document.querySelectorAll('.recommendation-card');
+            
+            // Check if we need to expand a card based on query parameters or form submissions
+            const shouldExpandIngredients = {{ ingredient_query|yesno:"true,false" }};
+            const shouldExpandMood = {{ mood_recipes|yesno:"true,false" }};
+            
+            if (shouldExpandIngredients) {
+                expandCard(document.getElementById('ingredients-card'));
+            } else if (shouldExpandMood) {
+                expandCard(document.getElementById('mood-card'));
+            }
+            
+            // Add click event to all cards
+            cards.forEach(card => {
+                card.addEventListener('click', function(e) {
+                    // Don't trigger if clicking on a form element or link inside the expanded content
+                    if (e.target.closest('form') && card.classList.contains('active')) {
+                        return;
+                    }
+                    
+                    // If clicking on a link in results, don't trigger card toggle
+                    if (e.target.closest('.recipe-link') || e.target.closest('button')) {
+                        return;
+                    }
+                    
+                    // Toggle this card
+                    toggleCard(card);
+                });
+            });
+            
+            function toggleCard(card) {
+                const isActive = card.classList.contains('active');
+                
+                // First close all cards
+                cards.forEach(c => {
+                    c.classList.remove('active');
+                    const content = c.querySelector('.card-content');
+                    content.style.display = 'none';
+                });
+                
+                // If the clicked card wasn't active before, expand it
+                if (!isActive) {
+                    expandCard(card);
+                }
+            }
+            
+            function expandCard(card) {
+                card.classList.add('active');
+                const content = card.querySelector('.card-content');
+                content.style.display = 'block';
+                
+                // Scroll to the card if it's not in view
+                setTimeout(() => {
+                    const rect = card.getBoundingClientRect();
+                    if (rect.top < 0 || rect.bottom > window.innerHeight) {
+                        card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                }, 100);
+            }
+        });
+    </script>
+{% endblock %}

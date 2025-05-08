@@ -1,0 +1,1468 @@
+{% extends 'base.html' %}
+
+{% block title %}Home - Recipe Recommender{% endblock %}
+
+{% block content %}
+{% load static %}
+<!-- Hero Banner -->
+<section class="hero-banner animate-fade-in">
+    <div class="hero-overlay"></div>
+    <div class="hero-shapes">
+        <div class="shape shape-1"></div>
+        <div class="shape shape-2"></div>
+        <div class="shape shape-3"></div>
+        <div class="shape shape-4"></div>
+    </div>
+    <div class="hero-content">
+        <h1 class="animate-slide-in">Find Your <span class="highlight-text">Perfect</span> Recipe</h1>
+        <p class="animate-slide-in" style="animation-delay: 0.2s;">Personalized recommendations based on your preferences, dietary needs, and pantry ingredients</p>
+        <div class="hero-buttons animate-slide-in" style="animation-delay: 0.4s;">
+            <a href="{% url 'recommendations' %}" class="btn btn-hero-primary">
+                <i class="fas fa-robot"></i> Get AI Recommendations
+            </a>
+            <a href="{% url 'search' %}" class="btn btn-hero-secondary">
+                <i class="fas fa-search"></i> Search Recipes
+            </a>
+        </div>
+    </div>
+    <div class="hero-image">
+        <img src="{% static 'recipes/images/food3.png' %}" alt="Delicious food" class="floating-image">
+    </div>
+</section>
+
+<!-- Quick Actions Section -->
+<section class="quick-actions">
+    <div class="container">
+        <div class="section-header">
+            <h2 class="fade-in-element">How Can We Help?</h2>
+            <p class="fade-in-element" style="animation-delay: 0.2s;">Choose your cooking adventure</p>
+        </div>
+        <div class="action-cards">
+            <div class="action-card" data-aos="fade-up" data-aos-delay="100">
+                <div class="action-icon">
+                    <i class="fas fa-carrot"></i>
+                </div>
+                <h3>Ingredients Search</h3>
+                <p>Find recipes with ingredients you already have</p>
+                <a href="{% url 'search' %}?type=ingredients" class="action-link">Search by Ingredients <i class="fas fa-arrow-right"></i></a>
+            </div>
+            <div class="action-card mood-card" data-aos="fade-up" data-aos-delay="300">
+                <div class="action-icon">
+                    <i class="fas fa-smile"></i>
+                </div>
+                <h3>Mood2Meal</h3>
+                <p>Let your feelings guide your food choices</p>
+                <a href="{% url 'recommendations' %}" class="action-link">Match Your Mood <i class="fas fa-arrow-right"></i></a>
+            </div>
+            <div class="action-card" data-aos="fade-up" data-aos-delay="400">
+                <div class="action-icon">
+                    <i class="fas fa-utensils"></i>
+                </div>
+                <h3>Meal Planner</h3>
+                <p>Plan your meals for the week ahead</p>
+                <a href="{% url 'meal_planner' %}" class="action-link">Start Planning <i class="fas fa-arrow-right"></i></a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Showcase -->
+<section class="features-showcase">
+    <div class="features-blob"></div>
+    <div class="container">
+        <h2 class="section-title fade-in-element">Why Choose Recipe Recommender?</h2>
+        <div class="features-grid">
+            <div class="feature-card" data-aos="zoom-in" data-aos-delay="100">
+                <div class="feature-icon">
+                    <i class="fas fa-brain"></i>
+                </div>
+                <h3>AI-Powered Recommendations</h3>
+                <p>Our smart algorithm learns your taste preferences and dietary needs to suggest recipes you'll love.</p>
+            </div>
+            <div class="feature-card" data-aos="zoom-in" data-aos-delay="200">
+                <div class="feature-icon">
+                    <i class="fas fa-filter"></i>
+                </div>
+                <h3>Advanced Filtering</h3>
+                <p>Filter recipes by cuisine, diet type, allergies, cooking time, and more.</p>
+            </div>
+            <div class="feature-card" data-aos="zoom-in" data-aos-delay="300">
+                <div class="feature-icon">
+                    <i class="fas fa-calendar-check"></i>
+                </div>
+                <h3>Weekly Meal Planning</h3>
+                <p>Plan your meals for the week with nutrition tracking.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Recipe Categories -->
+<section class="recipe-categories">
+    <div class="container">
+        <div class="section-header">
+            <h2 class="section-title fade-in-element">Explore Categories</h2>
+            <p class="fade-in-element" style="animation-delay: 0.2s;">Find recipes perfect for any occasion</p>
+        </div>
+        <div class="category-slider" id="categorySlider">
+            <style>
+                .breakfast-card {
+                  background-image: url("{% static 'recipes/images/food.png' %}");
+                  background-size: cover;
+                  background-position: center;
+                }
+              </style>
+              
+              <div class="category-card breakfast-card">
+                  <div class="category-overlay"></div>
+                  <h3>Breakfast</h3>
+                  <a href="{% url 'search' %}?category=breakfast" class="category-link">
+                      Explore <i class="fas fa-arrow-right"></i>
+                  </a>
+              </div>
+              <style>
+                .lunch-card {
+                  background-image: url("{% static 'recipes/images/lunch.png' %}");
+                  background-size: cover;
+                  background-position: center;
+                }
+              </style>
+              
+              <div class="category-card lunch-card">
+                  <div class="category-overlay"></div>
+                  <h3>Lunch</h3>
+                  <a href="{% url 'search' %}?category=lunch" class="category-link">
+                      Explore <i class="fas fa-arrow-right"></i>
+                  </a>
+              </div>
+              <style>
+                .dinner-card {
+                  background-image: url("{% static 'recipes/images/food4.png' %}");
+                  background-size: cover;
+                  background-position: center;
+                }
+              </style>
+              
+              <div class="category-card dinner-card">
+                  <div class="category-overlay"></div>
+                  <h3>Dinner</h3>
+                  <a href="{% url 'search' %}?category=dinner" class="category-link">
+                      Explore <i class="fas fa-arrow-right"></i>
+                  </a>
+              </div>
+            <div class="category-card" style="background-image: url('/api/placeholder/400/320')">
+                <div class="category-overlay"></div>
+                <h3>Desserts</h3>
+                <a href="{% url 'search' %}?category=desserts" class="category-link">Explore <i class="fas fa-arrow-right"></i></a>
+            </div>
+            <div class="category-card" style="background-image: url('/api/placeholder/400/320')">
+                <div class="category-overlay"></div>
+                <h3>Vegetarian</h3>
+                <a href="{% url 'search' %}?diet=vegetarian" class="category-link">Explore <i class="fas fa-arrow-right"></i></a>
+            </div>
+        </div>
+        <div class="slider-controls">
+            <button class="slider-arrow prev" id="prevCategory"><i class="fas fa-chevron-left"></i></button>
+            <div class="slider-dots" id="categoryDots"></div>
+            <button class="slider-arrow next" id="nextCategory"><i class="fas fa-chevron-right"></i></button>
+        </div>
+    </div>
+</section>
+
+<!-- Testimonials -->
+<section class="testimonials">
+    <div class="testimonial-blob-1"></div>
+    <div class="testimonial-blob-2"></div>
+    <div class="container">
+        <div class="section-header">
+            <h2 class="section-title fade-in-element">What Our Users Say</h2>
+            <p class="fade-in-element" style="animation-delay: 0.2s;">Real experiences from our community</p>
+        </div>
+        <div class="testimonial-carousel" id="testimonialCarousel">
+            <div class="testimonial-card active">
+                <div class="testimonial-rating">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                </div>
+                <p class="testimonial-text">"Recipe Recommender has completely changed how I plan my meals. The AI suggestions are spot on, and I've discovered so many new recipes my family loves!"</p>
+                <div class="testimonial-author">
+                    <div class="author-avatar">
+                        <img src="{% static 'recipes/images/avatar.png' %}" alt="User avatar">
+                    </div>
+                    <div class="author-info">
+                        <h4>Sarah Johnson</h4>
+                        <p>Home Cook</p>
+                    </div>
+                </div>
+            </div>
+            <div class="testimonial-card">
+                <div class="testimonial-rating">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                </div>
+                <p class="testimonial-text">"As someone with dietary restrictions, finding recipes used to be a challenge. This app makes it so easy to filter and find delicious meals that fit my needs!"</p>
+                <div class="testimonial-author">
+                    <div class="author-avatar">
+                        <img src="{% static 'recipes/images/avatar2.png' %}" alt="User avatar">
+                    </div>
+                    <div class="author-info">
+                        <h4>Michael Rodriguez</h4>
+                        <p>Fitness Enthusiast</p>
+                    </div>
+                </div>
+            </div>
+            <div class="testimonial-card">
+                <div class="testimonial-rating">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star-half-alt"></i>
+                </div>
+                <p class="testimonial-text">"The Mood2Meal feature is genius! I was feeling down and it suggested comfort foods that actually made me feel better. This app understands the connection between food and emotions!"</p>
+                <div class="testimonial-author">
+                    <div class="author-avatar">
+                        <img src="{% static 'recipes/images/avatar3.png' %}" alt="User avatar">
+                    </div>
+                    <div class="author-info">
+                        <h4>Emily Chen</h4>
+                        <p>Busy Professional</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="testimonial-nav">
+            <button class="testimonial-dot active" data-index="0"></button>
+            <button class="testimonial-dot" data-index="1"></button>
+            <button class="testimonial-dot" data-index="2"></button>
+        </div>
+    </div>
+</section>
+
+<!-- Call to Action -->
+<section class="cta-section">
+    <div class="cta-bg-shapes">
+        <div class="shape shape-1"></div>
+        <div class="shape shape-2"></div>
+        <div class="shape shape-3"></div>
+    </div>
+    <div class="container">
+        <div class="cta-content">
+            <h2 class="fade-in-element">Ready to transform your cooking experience?</h2>
+            <p class="fade-in-element" style="animation-delay: 0.2s;">Get personalized recipe recommendations based on your preferences and what's in your kitchen right now.</p>
+            <a href="{% url 'recommendations' %}" class="btn btn-cta fade-in-element" style="animation-delay: 0.4s;">
+                <i class="fas fa-robot"></i> Get AI Recommendations
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Custom styles for home page -->
+<style>
+    :root {
+        --primary: #320aa0;
+        --primary-hover: #4335c1;
+        --primary-light: #554ed4;
+        --primary-transparent: rgba(108, 99, 255, 0.1);
+        --secondary: #6bd8ff;
+        --secondary-hover: #52e2ff;
+        --secondary-light: #fbff8a;
+        --tertiary: #4ECDC4;
+        --tertiary-hover: #3DBEB6;
+        --accent: #FFE66D;
+        --accent-hover: #FFDD3C;
+        --dark: #2E2E4F;
+        --light: #F7F7FF;
+        --gray: #767689;
+        --gray-light: #F1F2F6;
+        --gradient-primary: linear-gradient(135deg, var(--primary), #A594FD);
+        --gradient-secondary: linear-gradient(135deg, var(--secondary), #FF9F7F);
+        --gradient-tertiary: linear-gradient(135deg, var(--tertiary), #67E8E1);
+        --gradient-mood: linear-gradient(135deg, #FF6CAB, #7366FF);
+        --gradient-hero: linear-gradient(135deg, #6C63FF, #FF6CAB);
+        --gradient-cta: linear-gradient(135deg, #6C63FF, #554AD8);
+        --gradient-testimonial: linear-gradient(45deg, #F8FBFF, #F1F5FF);
+        --shadow-sm: 0 5px 15px rgba(108, 99, 255, 0.08);
+        --shadow-md: 0 10px 30px rgba(108, 99, 255, 0.12);
+        --shadow-lg: 0 15px 40px rgba(108, 99, 255, 0.15);
+        --shadow-hover: 0 15px 35px rgba(108, 99, 255, 0.25);
+        --border-radius-sm: 0.75rem;
+        --border-radius-md: 1.25rem;
+        --border-radius-lg: 2rem;
+        --border-radius-xl: 3rem;
+        --border-radius-full: 9999px;
+        --font-primary: 'Poppins', sans-serif;
+        --font-secondary: 'Montserrat', sans-serif;
+        --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        --transition-bounce: all 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+
+    body {
+        font-family: var(--font-primary);
+        background-color: #FFFFFF;
+        color: var(--dark);
+        overflow-x: hidden;
+    }
+
+    .container {
+        max-width: 1320px;
+        margin: 0 auto;
+        padding: 0 1.5rem;
+    }
+
+    /* Animations */
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    @keyframes slideIn {
+        from { 
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to { 
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+        100% { transform: scale(1); }
+    }
+
+    @keyframes float {
+        0% { transform: translateY(0px); }
+        50% { transform: translateY(-15px); }
+        100% { transform: translateY(0px); }
+    }
+
+    @keyframes rotate {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    @keyframes gradientBG {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+
+    .animate-fade-in {
+        animation: fadeIn 1s ease forwards;
+    }
+
+    .animate-slide-in {
+        opacity: 0;
+        animation: slideIn 0.7s ease forwards;
+    }
+
+    .fade-in-element {
+        opacity: 0;
+        transform: translateY(20px);
+        transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+
+    .fade-in-element.animated {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    .floating-image {
+        animation: float 6s ease-in-out infinite;
+    }
+
+    /* Section Styles */
+    .section-header {
+        text-align: center;
+        margin-bottom: 3.5rem;
+    }
+
+    .section-header h2 {
+        font-size: 2.8rem;
+        font-weight: 800;
+        margin-bottom: 1rem;
+        background: var(--gradient-primary);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        color: transparent;
+    }
+
+    .section-header p {
+        font-size: 1.2rem;
+        color: var(--gray);
+        max-width: 700px;
+        margin: 0 auto;
+    }
+
+    .section-title {
+        text-align: center;
+        margin-bottom: 3.5rem;
+        font-size: 2.8rem;
+        font-weight: 800;
+        color: var(--dark);
+        position: relative;
+        padding-bottom: 1.5rem;
+        z-index: 1;
+        background: var(--gradient-primary);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        color: transparent;
+    }
+
+    .section-title:after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100px;
+        height: 4px;
+        background: var(--gradient-primary);
+        border-radius: 2px;
+    }
+
+    /* Hero Banner */
+    .hero-banner {
+        position: relative;
+        height: 90vh;
+        min-height: 600px;
+        max-height: 900px;
+        background: var(--light);
+        color: var(--dark);
+        display: flex;
+        align-items: center;
+        overflow: hidden;
+        margin-bottom: 6rem;
+        border-radius: 0 0 30% 0;
+    }
+
+    .hero-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: url('/api/placeholder/50/50');
+        opacity: 0.03;
+        z-index: 1;
+    }
+
+    .hero-shapes {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 0;
+    }
+
+    .hero-shapes .shape {
+        position: absolute;
+        border-radius: 50%;
+    }
+
+    .hero-shapes .shape-1 {
+        width: 400px;
+        height: 400px;
+        top: -100px;
+        left: -200px;
+        background: var(--gradient-primary);
+        opacity: 0.1;
+    }
+
+    .hero-shapes .shape-2 {
+        width: 300px;
+        height: 300px;
+        top: 50%;
+        right: -150px;
+        background: var(--gradient-secondary);
+        opacity: 0.1;
+    }
+
+    .hero-shapes .shape-3 {
+        width: 200px;
+        height: 200px;
+        bottom: -50px;
+        left: 25%;
+        background: var(--gradient-tertiary);
+        opacity: 0.1;
+    }
+
+    .hero-shapes .shape-4 {
+        width: 250px;
+        height: 250px;
+        top: 20%;
+        left: 40%;
+        background: var(--accent);
+        opacity: 0.07;
+    }
+
+    .hero-content {
+        position: relative;
+        z-index: 2;
+        max-width: 650px;
+        padding: 2rem;
+        margin-left: 6%;
+    }
+
+    .hero-image {
+        position: absolute;
+        right: 1%;
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 2;
+        max-width: 40%;
+    }
+
+    .hero-image img {
+        border-radius: var(--border-radius-lg);
+        box-shadow: var(--shadow-lg);
+    }
+
+    .hero-content h1 {
+        font-size: 4.5rem;
+        font-weight: 800;
+        margin-bottom: 1.8rem;
+        line-height: 1.1;
+        letter-spacing: -0.5px;
+    }
+
+    .highlight-text {
+        position: relative;
+        z-index: 1;
+        color: var(--primary);
+    }
+
+    .highlight-text::after {
+        content: '';
+        position: absolute;
+        left: -5px;
+        right: -5px;
+        bottom: 5px;
+        height: 15px;
+        background: var(--accent);
+        z-index: -1;
+        opacity: 0.5;
+        transform: skewX(-10deg);
+    }
+
+    .hero-content p {
+        font-size: 1.6rem;
+        margin-bottom: 2.8rem;
+        line-height: 1.5;
+        color: var(--gray);
+        font-weight: 300;
+    }
+
+    .hero-buttons {
+        display: flex;
+        gap: 1.3rem;
+    }
+
+    .btn-hero-primary {
+        padding: 1rem;
+        background: var(--gradient-primary);
+        color: white;
+        border: none;
+        border-radius: var(--border-radius-lg);
+        font-size: 1.1rem;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        transition: var(--transition-bounce);
+        text-decoration: none;
+        box-shadow: 0 8px 20px rgba(108, 99, 255, 0.4);
+        position: relative;
+        overflow: hidden;
+        z-index: 1;
+    }
+
+    .btn-hero-primary::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(to right, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0));
+        transform: translateX(-100%);
+        transition: transform 1s ease;
+        z-index: -1;
+    }
+
+    .btn-hero-primary:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 30px rgba(108, 99, 255, 0.5);
+    }
+
+    .btn-hero-primary:hover::before {
+        transform: translateX(100%);
+    }
+
+    .btn-hero-primary i {
+        margin-right: 0.8rem;
+        font-size: 1.1rem;
+    }
+
+    .btn-hero-secondary {
+        padding: 1.2rem 2.5rem;
+        background: transparent;
+        color: var(--primary);
+        border: 2px solid var(--primary);
+        border-radius: var(--border-radius-lg);
+        font-size: 1.1rem;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        transition: var(--transition-bounce);
+        text-decoration: none;
+        position: relative;
+        overflow: hidden;
+        z-index: 1;
+    }
+
+    .btn-hero-secondary::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: var(--primary-transparent);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        z-index: -1;
+    }
+
+    .btn-hero-secondary:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-md);
+        color: white;
+        border: white;
+    }
+
+    .btn-hero-secondary:hover::before {
+        opacity: 1;
+    }
+
+    .btn-hero-secondary i {
+        margin-right: 0.8rem;
+        font-size: 1.1rem;
+    }
+
+    /* Quick Actions */
+    .quick-actions {
+        padding: 2rem 0 7rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .action-cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 2.5rem;
+    }
+
+    .action-card {
+        background: white;
+        border-radius: var(--border-radius-lg);
+        padding: 2.5rem 2rem;
+        box-shadow: var(--shadow-md);
+        transition: var(--transition-bounce);
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+        height: 100%;
+        border: 1px solid rgba(0, 0, 0, 0.03);
+        z-index: 1;
+    }
+
+    .action-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 5px;
+        background: var(--gradient-primary);
+        transform: scaleX(0);
+        transform-origin: left;
+        transition: transform 0.5s ease;
+        z-index: 1;
+    }
+
+    .action-card::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 0;
+        background: linear-gradient(to top, var(--primary-transparent), transparent);
+        transition: height 0.5s ease;
+        z-index: -1;
+    }
+
+    .action-card:hover {
+        transform: translateY(-15px);
+        box-shadow: var(--shadow-hover);
+    }
+
+    .action-card:hover::before {
+        transform: scaleX(1);
+    }
+
+    .action-card:hover::after {
+        height: 100%;
+    }
+
+    .mood-card::before {
+        background: var(--gradient-mood);
+    }
+
+    .mood-card .action-icon {
+        background: var(--gradient-mood);
+        box-shadow: 0 10px 25px rgba(255, 108, 171, 0.3);
+    }
+
+    .mood-card .action-link {
+        color: #FF6CAB;
+    }
+
+    .mood-card .action-link::after {
+        background-color: #FF6CAB;
+    }
+
+    .mood-card .action-link:hover {
+        color: #E25A97;
+    }
+
+    .action-icon {
+        width: 90px;
+        height: 90px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.8rem;
+        background: var(--gradient-primary);
+        box-shadow: 0 10px 25px rgba(108, 99, 255, 0.3);
+        transition: transform 0.4s ease, box-shadow 0.4s ease;
+    }
+
+    .action-card:hover .action-icon {
+        transform: scale(1.1) rotate(5deg);
+        box-shadow: 0 15px 35px rgba(108, 99, 255, 0.4);
+    }
+
+    .action-icon i {
+        font-size: 2.2rem;
+        color: white;
+    }
+
+    .action-card h3 {
+        margin-bottom: 1.2rem;
+        font-size: 1.6rem;
+        font-weight: 700;
+        color: var(--dark);
+    }
+
+    .action-card p {
+        margin-bottom: 1.8rem;
+        color: var(--gray);
+        font-size: 1.05rem;
+        line-height: 1.6;
+    }
+
+    .action-link {
+        color: var(--primary);
+        font-weight: 700;
+        display: inline-flex;
+        align-items: center;
+        transition: color 0.3s;
+        text-decoration: none;
+        font-size: 1.1rem;
+        position: relative;
+    }
+
+    .action-link::after {
+        content: '';
+        position: absolute;
+        bottom: -3px;
+        left: 0;
+        width: 0;
+        height: 2px;
+        background-color: var(--primary);
+        transition: width 0.3s ease;
+    }
+
+    .action-link:hover {
+        color: var(--primary-hover);
+    }
+
+    .action-link:hover::after {
+        width: 100%;
+    }
+
+    .action-link i {
+        margin-left: 0.6rem;
+        transition: transform 0.3s;
+    }
+
+    .action-link:hover i {
+        transform: translateX(5px);
+    }
+
+    /* Features Showcase */
+    .features-showcase {
+        padding: 8rem 0;
+        background-color: var(--light);
+        margin: 0 3rem 6rem;
+        border-radius: var(--border-radius-xl);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .features-blob {
+        position: absolute;
+        top: -200px;
+        right: -150px;
+        width: 600px;
+        height: 600px;
+        background: var(--tertiary);
+        border-radius: 50%;
+        opacity: 0.05;
+        z-index: 0;
+    }
+
+    .features-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2.5rem;
+        position: relative;
+        z-index: 2;
+    }
+
+    .feature-card {
+        background: white;
+        border-radius: var(--border-radius-lg);
+        padding: 2.5rem 2rem;
+        box-shadow: var(--shadow-md);
+        transition: var(--transition);
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+        border: 1px solid rgba(0, 0, 0, 0.03);
+    }
+
+    .feature-card:hover {
+        transform: translateY(-10px);
+        box-shadow: var(--shadow-hover);
+    }
+
+    .feature-icon {
+        width: 80px;
+        height: 80px;
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+        background: var(--primary-transparent);
+        transition: transform 0.4s ease;
+    }
+
+    .feature-card:hover .feature-icon {
+        transform: scale(1.1);
+        background: var(--primary-light);
+    }
+
+    .feature-icon i {
+        font-size: 2rem;
+        color: var(--primary);
+        transition: color 0.4s ease;
+    }
+
+    .feature-card:hover .feature-icon i {
+        color: white;
+    }
+
+    .feature-card h3 {
+        margin-bottom: 1rem;
+        font-size: 1.4rem;
+        font-weight: 700;
+        color: var(--dark);
+    }
+
+    .feature-card p {
+        color: var(--gray);
+        font-size: 1rem;
+        line-height: 1.6;
+    }
+
+    /* Recipe Categories */
+    .recipe-categories {
+        padding: 2rem 0 7rem;
+    }
+
+    .category-slider {
+        display: flex;
+        gap: 1.5rem;
+        width: 100%;
+        overflow-x: hidden;
+        position: relative;
+        padding: 2rem 0;
+    }
+
+    .category-card {
+        flex: 0 0 300px;
+        height: 250px;
+        border-radius: var(--border-radius-lg);
+        position: relative;
+        background-size: cover;
+        background-position: center;
+        box-shadow: var(--shadow-md);
+        transition: transform 0.5s ease, box-shadow 0.5s ease;
+        cursor: pointer;
+        overflow: hidden;
+    }
+
+    .category-card:hover {
+        transform: translateY(-10px) scale(1.03);
+        box-shadow: var(--shadow-hover);
+    }
+
+    .category-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(to top, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.2));
+        z-index: 1;
+        transition: opacity 0.3s ease;
+    }
+
+    .category-card:hover .category-overlay {
+        opacity: 0.9;
+    }
+
+    .category-card h3 {
+        position: absolute;
+        bottom: 50px;
+        left: 25px;
+        color: white;
+        font-size: 1.5rem;
+        font-weight: 700;
+        z-index: 2;
+        transition: transform 0.3s ease;
+    }
+
+    .category-card:hover h3 {
+        transform: translateY(-10px);
+    }
+
+    .category-link {
+        position: absolute;
+        bottom: 20px;
+        left: 25px;
+        color: var(--accent);
+        font-weight: 600;
+        text-decoration: none;
+        z-index: 2;
+        opacity: 0;
+        transform: translateY(20px);
+        transition: opacity 0.3s ease, transform 0.3s ease;
+        display: flex;
+        align-items: center;
+    }
+
+    .category-card:hover .category-link {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    .category-link i {
+        margin-left: 5px;
+        font-size: 0.9rem;
+        transition: transform 0.3s ease;
+    }
+
+    .category-link:hover i {
+        transform: translateX(5px);
+    }
+
+    .slider-controls {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-top: 2.5rem;
+    }
+
+    .slider-arrow {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: white;
+        border: none;
+        box-shadow: var(--shadow-md);
+        cursor: pointer;
+        transition: var(--transition);
+        color: var(--primary);
+        font-size: 1.2rem;
+    }
+
+    .slider-arrow:hover {
+        background: var(--primary);
+        color: white;
+        box-shadow: 0 10px 25px rgba(108, 99, 255, 0.3);
+    }
+
+    .slider-dots {
+        display: flex;
+        gap: 0.8rem;
+        margin: 0 1.5rem;
+    }
+
+    .slider-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: var(--gray-light);
+        transition: var(--transition);
+        cursor: pointer;
+    }
+
+    .slider-dot.active {
+        width: 30px;
+        border-radius: 10px;
+        background: var(--primary);
+    }
+
+    /* Testimonials */
+    .testimonials {
+        padding: 8rem 0;
+        background: var(--gradient-testimonial);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .testimonial-blob-1 {
+        position: absolute;
+        top: -100px;
+        left: -100px;
+        width: 300px;
+        height: 300px;
+        background: var(--primary);
+        border-radius: 50%;
+        opacity: 0.05;
+    }
+
+    .testimonial-blob-2 {
+        position: absolute;
+        bottom: -100px;
+        right: -100px;
+        width: 300px;
+        height: 300px;
+        background: var(--secondary);
+        border-radius: 50%;
+        opacity: 0.05;
+    }
+
+    .testimonial-carousel {
+        position: relative;
+        height: 300px;
+        max-width: 900px;
+        margin: 0 auto;
+    }
+
+    .testimonial-card {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        padding: 2.5rem;
+        background: white;
+        border-radius: var(--border-radius-lg);
+        box-shadow: var(--shadow-md);
+        transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        opacity: 0;
+        transform: translateX(50px);
+        z-index: 1;
+    }
+
+    .testimonial-card.active {
+        opacity: 1;
+        transform: translateX(0);
+        z-index: 2;
+    }
+
+    .testimonial-rating {
+        margin-bottom: 1.5rem;
+        color: var(--accent);
+        font-size: 1.2rem;
+    }
+
+    .testimonial-text {
+        font-size: 1.2rem;
+        line-height: 1.8;
+        color: var(--dark);
+        font-style: italic;
+        margin-bottom: 2rem;
+    }
+
+    .testimonial-author {
+        display: flex;
+        align-items: center;
+    }
+
+    .author-avatar {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        overflow: hidden;
+        margin-right: 1rem;
+        border: 3px solid var(--primary-light);
+    }
+
+    .author-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .author-info h4 {
+        font-size: 1.1rem;
+        font-weight: 700;
+        margin-bottom: 0.3rem;
+        color: var(--dark);
+    }
+
+    .author-info p {
+        font-size: 0.9rem;
+        color: var(--gray);
+    }
+
+    .testimonial-nav {
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+        margin-top: 2rem;
+    }
+
+    .testimonial-dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: var(--gray-light);
+        border: none;
+        cursor: pointer;
+        transition: var(--transition);
+    }
+
+    .testimonial-dot.active {
+        background: var(--primary);
+        transform: scale(1.3);
+    }
+
+    /* Call to Action */
+    .cta-section {
+        padding: 5rem 0;
+        margin: 6rem 0;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+        background: var(--gradient-cta);
+        border-radius: var(--border-radius-xl);
+    }
+
+    .cta-bg-shapes {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 0;
+    }
+
+    .cta-bg-shapes .shape {
+        position: absolute;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.1);
+    }
+
+    .cta-bg-shapes .shape-1 {
+        width: 300px;
+        height: 300px;
+        top: -150px;
+        left: 10%;
+    }
+
+    .cta-bg-shapes .shape-2 {
+        width: 200px;
+        height: 200px;
+        bottom: -100px;
+        right: 15%;
+    }
+
+    .cta-bg-shapes .shape-3 {
+        width: 100px;
+        height: 100px;
+        top: 30%;
+        right: 30%;
+        opacity: 0.5;
+    }
+
+    .cta-content {
+        max-width: 800px;
+        margin: 0 auto;
+        position: relative;
+        z-index: 1;
+    }
+
+    .cta-content h2 {
+        color: white;
+        font-size: 3rem;
+        font-weight: 800;
+        margin-bottom: 1.5rem;
+    }
+
+    .cta-content p {
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 1.3rem;
+        margin-bottom: 2.5rem;
+        max-width: 600px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .btn-cta {
+        padding: 1.2rem 2.8rem;
+        background: white;
+        color: var(--primary);
+        border: none;
+        border-radius: var(--border-radius-lg);
+        font-size: 1.2rem;
+        font-weight: 700;
+        display: inline-flex;
+        align-items: center;
+        transition: var(--transition-bounce);
+        text-decoration: none;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    }
+
+    .btn-cta:hover {
+        transform: translateY(-5px) scale(1.05);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+        color: rgb(208, 20, 51);
+        background-color: white;
+    }
+
+    .btn-cta i {
+        margin-right: 0.8rem;
+        font-size: 1.2rem;
+    }
+
+    /* Responsive Styles */
+    @media (max-width: 1200px) {
+        .hero-content h1 {
+            font-size: 3.5rem;
+        }
+        
+        .hero-content p {
+            font-size: 1.4rem;
+        }
+    }
+
+    @media (max-width: 992px) {
+        .hero-banner {
+            height: auto;
+            padding: 6rem 0;
+            flex-direction: column;
+            text-align: center;
+        }
+        
+        .hero-content {
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+        
+        .hero-buttons {
+            justify-content: center;
+        }
+        
+        .hero-image {
+            position: relative;
+            right: auto;
+            top: auto;
+            transform: none;
+            max-width: 80%;
+            margin: 3rem auto 0;
+        }
+        
+        .action-cards {
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        }
+        
+        .cta-content h2 {
+            font-size: 2.5rem;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .hero-content h1 {
+            font-size: 3rem;
+        }
+        
+        .hero-content p {
+            font-size: 1.2rem;
+        }
+        
+        .hero-buttons {
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .features-showcase {
+            margin: 0 1rem 4rem;
+            padding: 5rem 0;
+        }
+        
+        .testimonial-card {
+            padding: 2rem 1.5rem;
+        }
+        
+        .testimonial-text {
+            font-size: 1rem;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .hero-content h1 {
+            font-size: 2.5rem;
+        }
+        
+        .section-header h2, .section-title {
+            font-size: 2.2rem;
+        }
+        
+        .cta-content h2 {
+            font-size: 2rem;
+        }
+        
+        .cta-content p {
+            font-size: 1.1rem;
+        }
+    }
+</style>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Animate elements on scroll
+        const fadeElements = document.querySelectorAll('.fade-in-element');
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('animated');
+                }
+            });
+        }, { threshold: 0.1 });
+        
+        fadeElements.forEach(element => {
+            observer.observe(element);
+        });
+        
+        // Category Slider
+        const categorySlider = document.getElementById('categorySlider');
+        const prevCategory = document.getElementById('prevCategory');
+        const nextCategory = document.getElementById('nextCategory');
+        const categoryDots = document.getElementById('categoryDots');
+        const categoryCards = categorySlider.querySelectorAll('.category-card');
+        let categoryIndex = 0;
+        const categoryVisibleCount = window.innerWidth > 992 ? 3 : window.innerWidth > 576 ? 2 : 1;
+        
+        // Create dots
+        for (let i = 0; i < categoryCards.length - categoryVisibleCount + 1; i++) {
+            const dot = document.createElement('div');
+            dot.classList.add('slider-dot');
+            if (i === 0) {
+                dot.classList.add('active');
+            }
+            dot.addEventListener('click', () => {
+                categoryIndex = i;
+                updateCategorySlider();
+            });
+            categoryDots.appendChild(dot);
+        }
+        
+        function updateCategorySlider() {
+            const slideAmount = -categoryIndex * (300 + 16); // card width + gap
+            categorySlider.style.transform = `translateX(${slideAmount}px)`;
+            
+            // Update dots
+            const dots = categoryDots.querySelectorAll('.slider-dot');
+            dots.forEach((dot, i) => {
+                dot.classList.toggle('active', i === categoryIndex);
+            });
+        }
+        
+        prevCategory.addEventListener('click', () => {
+            if (categoryIndex > 0) {
+                categoryIndex--;
+                updateCategorySlider();
+            }
+        });
+        
+        nextCategory.addEventListener('click', () => {
+            if (categoryIndex < categoryCards.length - categoryVisibleCount) {
+                categoryIndex++;
+                updateCategorySlider();
+            }
+        });
+        
+        // Testimonial Carousel
+        const testimonialDots = document.querySelectorAll('.testimonial-dot');
+        const testimonialCards = document.querySelectorAll('.testimonial-card');
+        
+        testimonialDots.forEach((dot, index) => {
+            dot.addEventListener('click', () => {
+                // Remove active class from all dots and cards
+                testimonialDots.forEach(d => d.classList.remove('active'));
+                testimonialCards.forEach(card => card.classList.remove('active'));
+                
+                // Add active class to current dot and card
+                dot.classList.add('active');
+                testimonialCards[index].classList.add('active');
+            });
+        });
+        
+        // Auto slide testimonials
+        let testimonialIndex = 0;
+        
+        function nextTestimonial() {
+            testimonialIndex = (testimonialIndex + 1) % testimonialCards.length;
+            testimonialDots.forEach(d => d.classList.remove('active'));
+            testimonialCards.forEach(card => card.classList.remove('active'));
+            
+            testimonialDots[testimonialIndex].classList.add('active');
+            testimonialCards[testimonialIndex].classList.add('active');
+        }
+        
+        setInterval(nextTestimonial, 5000);
+    });
+</script>
+{% endblock %}

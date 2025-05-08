@@ -1,0 +1,626 @@
+{% extends "base.html" %}
+
+{% block title %}{{ recipe.title }}{% endblock %}
+
+
+
+{% block content %}
+<div class="recipe-container">
+    <!-- Recipe Header -->
+    <div class="recipe-header">
+        <h1 class="recipe-title">{{ recipe.title }}</h1>
+        
+        <div class="recipe-meta">
+            {% if recipe.minutes %}
+            <div class="recipe-meta-item">
+                <i class="far fa-clock"></i>
+                <span>{{ recipe.minutes }} minutes</span>
+            </div>
+            {% endif %}
+            
+            {% if recipe.difficulty %}
+            <div class="recipe-meta-item">
+                <i class="fas fa-chart-line"></i>
+                <span>{{ recipe.difficulty }}</span>
+            </div>
+            {% endif %}
+            
+            {% if recipe.servings %}
+            <div class="recipe-meta-item">
+                <i class="fas fa-users"></i>
+                <span>{{ recipe.servings }} servings</span>
+            </div>
+            {% endif %}
+            
+            <div class="recipe-meta-item">
+                <i class="fas fa-star"></i>
+                <span>{{ avg_rating|floatformat:1 }}/5</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recipe Content -->
+    <div class="recipe-content">
+        {% if recipe.description %}
+        <div class="recipe-description">
+            {{ recipe.description }}
+        </div>
+        {% endif %}
+
+        <!-- Ingredients Section -->
+        <div class="recipe-section">
+            <h3 class="recipe-section-title">
+                <i class="fas fa-shopping-basket"></i>
+                Ingredients
+            </h3>
+            <div class="ingredients-list">
+                <ul>
+                    {% for ingredient in ingredients_list %}
+                        <li>{{ ingredient }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        
+        <!-- Instructions Section -->
+        <div class="recipe-section">
+            <h3 class="recipe-section-title">
+                <i class="fas fa-utensils"></i>
+                Instructions
+            </h3>
+            <ol class="instructions-list">
+                {% for instruction in instructions_list %}
+                    <li>{{ instruction }}</li>
+                {% endfor %}
+            </ol>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="recipe-actions">
+            {% if user.is_authenticated %}
+                {% if user in recipe.userfavorites_set.all %}
+                    <a href="{% url 'remove_from_favorites' recipe.id %}" class="recipe-action-btn">
+                        <i class="fas fa-heart-broken"></i> Remove from Favorites
+                    </a>
+                {% else %}
+                    <a href="{% url 'add_to_favorites' recipe.id %}" class="recipe-action-btn">
+                        <i class="fas fa-heart"></i> Add to Favorites
+                    </a>
+                {% endif %}
+            {% else %}
+                <a href="{% url 'login' %}" class="recipe-action-btn outline">
+                    <i class="fas fa-sign-in-alt"></i> Log in to save recipe
+                </a>
+            {% endif %}
+            
+            <button class="recipe-action-btn outline" onclick="window.print()">
+                <i class="fas fa-print"></i> Print Recipe
+            </button>
+            
+            <button class="recipe-action-btn outline share-recipe">
+                <i class="fas fa-share-alt"></i> Share Recipe
+            </button>
+        </div>
+    </div>
+
+    <!-- Rating Section -->
+    <!-- Rating Section -->
+    <div class="rating-section">
+        <h3 class="rating-header">
+            <i class="fas fa-star"></i> Recipe Ratings
+        </h3>
+
+        <div class="avg-rating">
+            Average Rating: {{ avg_rating|floatformat:1 }}
+            <div class="stars">
+                {% with ''|center:5 as range %}
+                    {% for _ in range %}
+                        {% with forloop.counter as i %}
+                            {% if i <= avg_rating %}
+                                <i class="fas fa-star star"></i>
+                            {% elif i <= avg_rating|add:0.5 and i > avg_rating %}
+                                <i class="fas fa-star-half-alt star"></i>
+                            {% else %}
+                                <i class="far fa-star star"></i>
+                            {% endif %}
+                        {% endwith %}
+                    {% endfor %}
+                {% endwith %}
+            </div>
+        </div>
+    </div>
+
+        {% if user.is_authenticated %}
+            <div class="user-rating">
+                <p><strong>Your Rating:</strong> 
+                    {% if user_rating %}
+                        {{ user_rating }}/5
+                    {% else %}
+                        Not Rated Yet
+                    {% endif %}
+                </p>
+
+                <form method="post" class="rating-form">
+                    {% csrf_token %}
+                    <label for="rating">Rate this recipe:</label>
+                    
+                    <div class="star-rating">
+                        {% for i in "54321" %}
+                            <input type="radio" id="star{{ i }}" name="rating" value="{{ i }}" {% if user_rating == i %}checked{% endif %}>
+                            <label for="star{{ i }}"><i class="fas fa-star"></i></label>
+                        {% endfor %}
+                    </div>
+                    
+                    <button type="submit">Submit Rating</button>
+                </form>
+            </div>
+        {% else %}
+            <p><a href="{% url 'login' %}" class="recipe-action-btn btn-sm">Log in</a> to rate this recipe.</p>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Back to Search Link -->
+<a href="{% url 'home' %}" class="back-link">
+    <i class="fas fa-arrow-left"></i> Back to Search
+</a>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Handle share button
+        const shareButton = document.querySelector('.share-recipe');
+        if (shareButton) {
+            shareButton.addEventListener('click', function() {
+                if (navigator.share) {
+                    navigator.share({
+                        title: '{{ recipe.title }}',
+                        text: '{{ recipe.description|truncatechars:100 }}',
+                        url: window.location.href,
+                    })
+                    .catch(console.error);
+                } else {
+                    // Fallback for browsers that don't support the Web Share API
+                    // Create a temporary input to copy the URL
+                    const tempInput = document.createElement('input');
+                    tempInput.value = window.location.href;
+                    document.body.appendChild(tempInput);
+                    tempInput.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(tempInput);
+                    
+                    // Create a simple toast notification
+                    const toast = document.createElement('div');
+                    toast.style.position = 'fixed';
+                    toast.style.bottom = '20px';
+                    toast.style.right = '20px';
+                    toast.style.background = 'white';
+                    toast.style.padding = '10px 20px';
+                    toast.style.borderRadius = '4px';
+                    toast.style.boxShadow = '0 2px 10px rgba(0,0,0,0.1)';
+                    toast.style.zIndex = '1000';
+                    toast.style.animation = 'fadeIn 0.3s ease forwards';
+                    toast.innerText = 'Recipe URL copied to clipboard!';
+                    document.body.appendChild(toast);
+                    
+                    setTimeout(() => {
+                        toast.style.animation = 'fadeOut 0.3s ease forwards';
+                        setTimeout(() => document.body.removeChild(toast), 300);
+                    }, 3000);
+                }
+            });
+        }
+    });
+</script>
+<style>
+    /* Recipe Detail Page Styles */
+
+/* Main Recipe Container */
+.recipe-container {
+    max-width: 800px;
+    margin: 0 auto;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    animation: fadeIn 0.8s ease;
+}
+
+.recipe-header {
+    position: relative;
+    padding: 2.5rem 2rem;
+    background: linear-gradient(135deg, var(--primary) 0%, #4527a0 100%);
+    color: white;
+    text-align: center;
+}
+
+.recipe-title {
+    font-size: 2.2rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    line-height: 1.2;
+}
+
+.recipe-meta {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.recipe-meta-item {
+    display: flex;
+    align-items: center;
+    background-color: rgba(255, 255, 255, 0.15);
+    padding: 0.4rem 1rem;
+    border-radius: 50px;
+    font-size: 0.9rem;
+    backdrop-filter: blur(5px);
+}
+
+.recipe-meta-item i {
+    margin-right: 0.5rem;
+    font-size: 1rem;
+}
+
+.recipe-content {
+    padding: 2rem;
+}
+
+.recipe-description {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    color: var(--gray-dark, #495057);
+    margin-bottom: 2rem;
+    font-style: italic;
+    background-color: var(--light);
+    padding: 1.5rem;
+    border-radius: 8px;
+    border-left: 4px solid var(--primary);
+}
+
+/* Section Styles */
+.recipe-section {
+    margin-bottom: 2.5rem;
+}
+
+.recipe-section-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    color: var(--primary);
+}
+
+.recipe-section-title i {
+    margin-right: 0.75rem;
+    background-color: var(--primary);
+    color: white;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-size: 0.9rem;
+}
+
+/* Ingredients List */
+.ingredients-list {
+    background-color: var(--light);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    column-count: 2;
+    column-gap: 2rem;
+}
+
+.ingredients-list ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+.ingredients-list li {
+    position: relative;
+    padding: 0.5rem 0 0.5rem 1.75rem;
+    break-inside: avoid;
+    margin-bottom: 0.5rem;
+}
+
+.ingredients-list li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 10px;
+    height: 10px;
+    background-color: var(--primary);
+    border-radius: 50%;
+}
+
+/* Instructions */
+.instructions-list {
+    counter-reset: step-counter;
+    padding: 0;
+    list-style-type: none;
+}
+
+.instructions-list li {
+    position: relative;
+    padding: 1.5rem 1.5rem 1.5rem 3.5rem;
+    margin-bottom: 1.5rem;
+    background-color: var(--light);
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.instructions-list li::before {
+    content: counter(step-counter);
+    counter-increment: step-counter;
+    position: absolute;
+    left: 1rem;
+    top: 1.25rem;
+    background-color: var(--primary);
+    color: white;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+/* Action Buttons Section */
+.recipe-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin: 2rem 0;
+    padding: 1.5rem;
+    background-color: var(--light);
+    border-radius: 8px;
+}
+
+.recipe-action-btn {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.75rem 1.5rem;
+    background-color: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 500;
+    transition: var(--transition);
+    text-decoration: none;
+}
+
+.recipe-action-btn:hover {
+    background-color: var(--primary-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.recipe-action-btn i {
+    margin-right: 0.5rem;
+}
+
+.recipe-action-btn.outline {
+    background-color: transparent;
+    border: 2px solid var(--primary);
+    color: var(--primary);
+}
+
+.recipe-action-btn.outline:hover {
+    background-color: var(--primary);
+    color: white;
+}
+
+/* Rating Section */
+.rating-section {
+    padding: 2rem;
+    border-top: 1px solid rgba(0, 0, 0, 0.08);
+    background-color: #fbfbfb;
+}
+
+.rating-header {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+}
+
+.rating-header i {
+    color: var(--accent, #fdca40);
+    margin-right: 0.5rem;
+}
+
+.avg-rating {
+    display: flex;
+    align-items: center;
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+}
+
+.stars {
+    display: flex;
+    margin-left: 1rem;
+}
+
+.star {
+    color: var(--accent, #fdca40);
+    font-size: 1.5rem;
+    margin-right: 0.25rem;
+}
+
+.user-rating {
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.rating-form {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.rating-form label {
+    font-weight: 500;
+}
+
+.rating-form select {
+    padding: 0.5rem 1rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-family: 'Poppins', sans-serif;
+    background-color: white;
+}
+
+.rating-form button {
+    background-color: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 500;
+    transition: var(--transition);
+}
+
+.rating-form button:hover {
+    background-color: var(--primary-dark);
+}
+
+/* Back Link */
+.back-link {
+    display: inline-flex;
+    align-items: center;
+    margin-top: 2rem;
+    color: var(--primary);
+    text-decoration: none;
+    font-weight: 500;
+    transition: var(--transition);
+}
+
+.back-link:hover {
+    color: var(--primary-dark);
+}
+
+.back-link i {
+    margin-right: 0.5rem;
+}
+
+/* Custom Star Rating Input */
+.star-rating {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: flex-end;
+}
+
+.star-rating input {
+    display: none;
+}
+
+.star-rating label {
+    cursor: pointer;
+    color: #ddd;
+    font-size: 1.5rem;
+    padding: 0 0.1rem;
+    transition: color 0.2s ease;
+}
+
+.star-rating input:checked ~ label {
+    color: var(--accent, #fdca40);
+}
+
+.star-rating label:hover,
+.star-rating label:hover ~ label {
+    color: var(--accent, #fdca40);
+}
+
+/* Similar Recipes Section */
+.similar-recipes {
+    margin-top: 3rem;
+}
+
+.similar-recipes-title {
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+    font-weight: 600;
+    color: var(--primary);
+}
+
+.similar-recipes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1.5rem;
+}
+
+/* Print Styles */
+@media print {
+    .recipe-actions, .rating-section, .back-link, .similar-recipes {
+        display: none;
+    }
+    
+    .recipe-container {
+        box-shadow: none;
+    }
+    
+    .recipe-header {
+        color: black;
+        background: none;
+        padding: 1rem;
+    }
+    
+    .recipe-meta-item {
+        background: none;
+        padding: 0 1rem 0 0;
+    }
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .recipe-header {
+        padding: 2rem 1rem;
+    }
+    
+    .recipe-title {
+        font-size: 1.8rem;
+    }
+    
+    .recipe-content {
+        padding: 1.5rem;
+    }
+    
+    .ingredients-list {
+        column-count: 1;
+    }
+    
+    .instructions-list li {
+        padding: 1.5rem 1rem 1.5rem 3rem;
+    }
+    
+    .recipe-actions {
+        flex-direction: column;
+    }
+    
+    .recipe-action-btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+</style>
+{% endblock %}

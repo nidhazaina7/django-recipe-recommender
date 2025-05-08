@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>🍽️ Meal Plan for {{ days }} day(s) - {{ diet|title }} Diet</h2>
+
+{% for meal in meal_plan %}
+  <div class="meal-day">
+    <h3>{{ meal.Recipe_name }}</h3>
+    <p><strong>Calories:</strong> {{ meal.Calories }}</p>
+    <p><strong>Ingredients:</strong>
+      <ul>
+        {% for ingredient in meal.Ingredients %}
+          <li>{{ ingredient }}</li>
+        {% endfor %}
+      </ul>
+    </p>
+  </div>
+{% endfor %}
+
+{% endblock %}

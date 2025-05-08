@@ -1,0 +1,679 @@
+{% extends 'base.html' %}
+
+{% block title %}Meal Planner{% endblock %}
+
+{% block content %}
+<section class="meal-planner-section animate-fade-in">
+    <div class="planner-header text-center mb-4">
+        <h1>Personalized <span class="text-primary">Meal Planner</span></h1>
+        <p class="text-gray">Create a custom meal plan tailored to your dietary preferences</p>
+    </div>
+    
+    <div class="planner-container">
+        <div class="card planner-form-card">
+            <div class="card-body">
+                <h2 class="form-title mb-3"><i class="fas fa-clipboard-list"></i> Generate Your Plan</h2>
+                
+                <form method="post" class="planner-form">
+                    {% csrf_token %}
+                    
+                    <div class="form-group">
+                        <label for="diet_type">
+                            <i class="fas fa-utensils"></i> Choose Diet Type
+                        </label>
+                        <div class="diet-options">
+                            <div class="diet-option">
+                                <input type="radio" name="diet_type" id="paleo" value="paleo">
+                                <label for="paleo" class="diet-label">
+                                    <div class="diet-icon"><i class="fas fa-drumstick-bite"></i></div>
+                                    <span>Paleo</span>
+                                </label>
+                            </div>
+                            
+                            <div class="diet-option">
+                                <input type="radio" name="diet_type" id="keto" value="keto">
+                                <label for="keto" class="diet-label">
+                                    <div class="diet-icon"><i class="fas fa-cheese"></i></div>
+                                    <span>Keto</span>
+                                </label>
+                            </div>
+                            
+                            <div class="diet-option">
+                                <input type="radio" name="diet_type" id="vegan" value="vegan">
+                                <label for="vegan" class="diet-label">
+                                    <div class="diet-icon"><i class="fas fa-leaf"></i></div>
+                                    <span>Vegan</span>
+                                </label>
+                            </div>
+                            
+                            <div class="diet-option">
+                                <input type="radio" name="diet_type" id="mediterranean" value="mediterranean">
+                                <label for="mediterranean" class="diet-label">
+                                    <div class="diet-icon"><i class="fas fa-fish"></i></div>
+                                    <span>Mediterranean</span>
+                                </label>
+                            </div>
+                            
+                            <div class="diet-option">
+                                <input type="radio" name="diet_type" id="dash" value="dash">
+                                <label for="dash" class="diet-label">
+                                    <div class="diet-icon"><i class="fas fa-heartbeat"></i></div>
+                                    <span>DASH</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-settings">
+                        <div class="form-group">
+                            <label for="days">
+                                <i class="fas fa-calendar-alt"></i> Number of Days
+                            </label>
+                            <div class="days-selector">
+                                <button type="button" class="day-adjust minus">
+                                    <i class="fas fa-minus"></i>
+                                </button>
+                                <input type="number" name="days" id="days" min="1" max="7" value="3" required>
+                                <button type="button" class="day-adjust plus">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group switch-group">
+                            <label for="include_nutrition">
+                                <i class="fas fa-chart-pie"></i> Include Nutrition Facts
+                            </label>
+                            <label class="switch">
+                                <input type="checkbox" name="include_nutrition" id="include_nutrition">
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="form-action">
+                        <button type="submit" class="btn btn-lg">
+                            <i class="fas fa-magic"></i> Create My Meal Plan
+                        </button>
+                    </div>
+                </form>
+                
+                {% if error %}
+                <div class="error-message animate-fade-in">
+                    <i class="fas fa-exclamation-circle"></i> {{ error }}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="planner-benefits">
+            <div class="benefit-card">
+                <div class="benefit-icon">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <h3>Save Time</h3>
+                <p>No more wondering what to cook. Get a complete plan in seconds.</p>
+            </div>
+            
+            <div class="benefit-card">
+                <div class="benefit-icon">
+                    <i class="fas fa-seedling"></i>
+                </div>
+                <h3>Eat Healthier</h3>
+                <p>Balanced meals designed by nutrition experts for your diet type.</p>
+            </div>
+            
+            <div class="benefit-card">
+                <div class="benefit-icon">
+                    <i class="fas fa-coins"></i>
+                </div>
+                <h3>Reduce Waste</h3>
+                <p>Buy only what you need with organized meal plan.</p>
+            </div>
+        </div>
+    </div>
+    
+    {% if meal_plan %}
+    <div class="meal-plan-results animate-fade-in">
+        <h2 class="results-title mb-3">Your Custom Meal Plan</h2>
+        
+        <div class="plan-navigation">
+            <div class="plan-day-tabs">
+                {% for day in meal_plan %}
+                <button class="day-tab {% if forloop.first %}active{% endif %}" data-day="{{ day.day }}">
+                    Day {{ day.day }}
+                </button>
+                {% endfor %}
+            </div>
+        </div>
+        
+        <div class="day-content-container">
+            {% for day in meal_plan %}
+            <div class="day-content" id="day-{{ day.day }}" {% if not forloop.first %}style="display:none"{% endif %}>
+                <div class="meals-container">
+                    {% for meal in day.meals %}
+                    <div class="meal-card card">
+                        <div class="meal-time-badge">{{ meal.time|default:"Meal" }}</div>
+                        <div class="card-body">
+                            <h3 class="meal-name">{{ meal.name }}</h3>
+                            
+                            
+                            <div class="meal-actions">
+                                <button class="btn btn-sm">
+                                    <i class="fas fa-eye"></i> View Recipe
+                                </button>
+                                <button class="favorite-btn">
+                                    <i class="far fa-heart"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <div class="plan-actions">
+            <button class="btn btn-outline">
+                <i class="fas fa-download"></i> Download Plan
+            </button>
+            <button class="btn">
+                <i class="fas fa-shopping-cart"></i> Get Shopping List
+            </button>
+        </div>
+    </div>
+    {% endif %}
+</section>
+
+<style>
+    /* Meal Planner Styles */
+    .meal-planner-section {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem 1rem;
+    }
+    
+    .planner-header h1 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+    
+    .text-gray {
+        color: var(--gray);
+    }
+    
+    .planner-container {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 2rem;
+        margin-bottom: 3rem;
+    }
+    
+    @media (min-width: 992px) {
+        .planner-container {
+            grid-template-columns: 3fr 2fr;
+        }
+    }
+    
+    /* Form Card Styles */
+    .planner-form-card {
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        background-color: white;
+        height: 100%;
+    }
+    
+    .form-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: var(--dark);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    /* Diet Type Selection */
+    .diet-options {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+        gap: 1rem;
+        margin: 1rem 0;
+    }
+    
+    .diet-option {
+        position: relative;
+    }
+    
+    .diet-option input[type="radio"] {
+        position: absolute;
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+    
+    .diet-label {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 1rem;
+        background-color: var(--light);
+        border: 2px solid transparent;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: var(--transition);
+    }
+    
+    .diet-icon {
+        width: 48px;
+        height: 48px;
+        background-color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+        color: var(--primary);
+        margin-bottom: 0.5rem;
+        transition: var(--transition);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    
+    .diet-label span {
+        font-weight: 500;
+    }
+    
+    .diet-option input[type="radio"]:checked + .diet-label {
+        border-color: var(--primary);
+        background-color: rgba(58, 22, 176, 0.05);
+    }
+    
+    .diet-option input[type="radio"]:checked + .diet-label .diet-icon {
+        background-color: var(--primary);
+        color: white;
+        transform: scale(1.1);
+    }
+    
+    .diet-label:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.05);
+    }
+    
+    /* Form Settings */
+    .form-settings {
+        background-color: var(--light);
+        padding: 1.5rem;
+        border-radius: 8px;
+        margin: 1.5rem 0;
+    }
+    
+    .days-selector {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-top: 0.5rem;
+    }
+    
+    .days-selector input {
+        width: 60px;
+        text-align: center;
+        padding: 0.5rem;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 1rem;
+        font-weight: 600;
+    }
+    
+    .day-adjust {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: white;
+        border: 1px solid #ddd;
+        cursor: pointer;
+        transition: var(--transition);
+    }
+    
+    .day-adjust:hover {
+        background-color: var(--primary);
+        color: white;
+        border-color: var(--primary);
+    }
+    
+    /* Switch Styles */
+    .switch-group {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin: 1rem 0;
+    }
+    
+    .switch {
+        position: relative;
+        display: inline-block;
+        width: 50px;
+        height: 24px;
+    }
+    
+    .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+    
+    .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #ccc;
+        transition: .4s;
+    }
+    
+    .slider:before {
+        position: absolute;
+        content: "";
+        height: 16px;
+        width: 16px;
+        left: 4px;
+        bottom: 4px;
+        background-color: white;
+        transition: .4s;
+    }
+    
+    input:checked + .slider {
+        background-color: var(--primary);
+    }
+    
+    input:focus + .slider {
+        box-shadow: 0 0 1px var(--primary);
+    }
+    
+    input:checked + .slider:before {
+        transform: translateX(26px);
+    }
+    
+    .slider.round {
+        border-radius: 34px;
+    }
+    
+    .slider.round:before {
+        border-radius: 50%;
+    }
+    
+    /* Form Action */
+    .form-action {
+        display: flex;
+        justify-content: center;
+        margin-top: 2rem;
+    }
+    
+    .btn-lg {
+        padding: 0.75rem 1.5rem;
+        font-size: 1rem;
+    }
+    
+    /* Error Message */
+    .error-message {
+        background-color: #fff5f5;
+        color: #d00c40;
+        padding: 1rem;
+        border-radius: 8px;
+        margin-top: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    /* Benefits Section */
+    .planner-benefits {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .benefit-card {
+        background-color: white;
+        border-radius: 10px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+        transition: var(--transition);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+    
+    .benefit-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    .benefit-icon {
+        width: 60px;
+        height: 60px;
+        background-color: rgba(58, 22, 176, 0.1);
+        color: var(--primary);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .benefit-card h3 {
+        font-size: 1.2rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+    
+    .benefit-card p {
+        color: var(--gray);
+        font-size: 0.9rem;
+        margin: 0;
+    }
+    
+    /* Meal Plan Results */
+    .meal-plan-results {
+        margin-top: 3rem;
+        padding-top: 3rem;
+        border-top: 1px solid rgba(0, 0, 0, 0.1);
+    }
+    
+    .results-title {
+        font-size: 1.75rem;
+        font-weight: 700;
+        text-align: center;
+    }
+    
+    .plan-navigation {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 2rem;
+    }
+    
+    .plan-day-tabs {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    
+    .day-tab {
+        background-color: white;
+        border: 1px solid #ddd;
+        padding: 0.5rem 1rem;
+        border-radius: 50px;
+        cursor: pointer;
+        transition: var(--transition);
+        font-weight: 500;
+    }
+    
+    .day-tab:hover {
+        background-color: var(--light);
+    }
+    
+    .day-tab.active {
+        background-color: var(--primary);
+        color: white;
+        border-color: var(--primary);
+    }
+    
+    .meals-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .meal-card {
+        position: relative;
+        overflow: hidden;
+        height: 100%;
+    }
+    
+    .meal-time-badge {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        background-color: var(--primary);
+        color: white;
+        padding: 0.25rem 0.75rem;
+        border-radius: 50px;
+        font-size: 0.85rem;
+        font-weight: 500;
+    }
+    
+    .meal-name {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+    }
+    
+    .meal-ingredients h4 {
+        font-size: 1rem;
+        font-weight: 600;
+        margin-bottom: 0.75rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .ingredients-list {
+        list-style: disc;
+        padding-left: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .ingredients-list li {
+        margin-bottom: 0.5rem;
+        color: var(--gray);
+    }
+    
+    .meal-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 1rem;
+    }
+    
+    .favorite-btn {
+        background: none;
+        border: none;
+        font-size: 1.2rem;
+        color: var(--gray);
+        cursor: pointer;
+        transition: var(--transition);
+    }
+    
+    .favorite-btn:hover {
+        color: var(--primary-dark);
+        transform: scale(1.1);
+    }
+    
+    .plan-actions {
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+        margin-top: 2rem;
+    }
+    
+    /* Utility Classes */
+    .mb-3 {
+        margin-bottom: 1.5rem;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Day adjustment buttons
+        const daysInput = document.getElementById('days');
+        const minusBtn = document.querySelector('.day-adjust.minus');
+        const plusBtn = document.querySelector('.day-adjust.plus');
+        
+        minusBtn.addEventListener('click', function() {
+            let currentValue = parseInt(daysInput.value);
+            if (currentValue > 1) {
+                daysInput.value = currentValue - 1;
+            }
+        });
+        
+        plusBtn.addEventListener('click', function() {
+            let currentValue = parseInt(daysInput.value);
+            if (currentValue < 7) {
+                daysInput.value = currentValue + 1;
+            }
+        });
+        
+        // Diet option selection
+        const dietOptions = document.querySelectorAll('.diet-option input');
+        if (dietOptions.length > 0) {
+            dietOptions[0].checked = true; // Select first option by default
+        }
+        
+        // Tab navigation for meal plan results
+        const dayTabs = document.querySelectorAll('.day-tab');
+        const dayContents = document.querySelectorAll('.day-content');
+        
+        dayTabs.forEach(tab => {
+            tab.addEventListener('click', function() {
+                const dayNumber = this.getAttribute('data-day');
+                
+                // Update active tab
+                dayTabs.forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                
+                // Show selected day content
+                dayContents.forEach(content => {
+                    content.style.display = 'none';
+                });
+                document.getElementById(`day-${dayNumber}`).style.display = 'block';
+            });
+        });
+        
+        // Favorite button functionality
+        const favoriteButtons = document.querySelectorAll('.favorite-btn');
+        
+        favoriteButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const icon = this.querySelector('i');
+                if (icon.classList.contains('far')) {
+                    icon.classList.remove('far');
+                    icon.classList.add('fas');
+                } else {
+                    icon.classList.remove('fas');
+                    icon.classList.add('far');
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}
