@@ -12,7 +12,13 @@
         {% for item in contents %}
             <div class="recipe-card card">
                 <div class="card-img-container">
-                    <img src="{{ item.image.url }}" alt="{{ item.title }}" class="card-img">
+                    {% load static %}
+
+                    {% if item.image %}
+                        <img src="{{ item.image.url }}" alt="{{ item.title }}" class="card-img">
+                    {% else %}
+                        <img src="{% static 'recipes/images/food.png' %}" alt="default" class="card-img">
+                    {% endif %}
                 </div>
                 <div class="card-body">
                     <h3 class="card-title">{{ item.title }}</h3>

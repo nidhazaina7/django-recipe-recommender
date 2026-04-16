@@ -7,6 +7,7 @@ class Recipe(models.Model):
     ingredients = models.TextField()  # Store ingredients as newline-separated string
     instructions = models.TextField()
     description = models.TextField(blank=True, null=True)
+    image = models.ImageField(upload_to='uploads/', blank=True, null=True)
     tags = models.TextField(blank=True, null=True)
     minutes = models.IntegerField(blank=True, null=True)  # Preparation time
     nutrition = models.JSONField(blank=True, null=True)  # Nutrition info (fetched & stored as JSON)

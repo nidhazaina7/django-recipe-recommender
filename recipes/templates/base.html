@@ -52,7 +52,9 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 1rem;
+            padding: 0 1rem;
+            height: 84px;
+            gap: 1rem;
         }
 
         .logo {
@@ -62,6 +64,8 @@
             text-decoration: none;
             display: flex;
             align-items: center;
+            gap: 0.5rem;
+            flex-shrink: 0;
             transition: var(--transition);
         }
 
@@ -70,20 +74,19 @@
             transform: scale(1.05);
         }
 
-        .logo i {
-            margin-right: 0.5rem;
-        }
-
         nav ul {
             list-style: none;
             display: flex;
+            align-items: center;
+            flex: 1;
+            justify-content: center;
             margin: 0;
             padding: 0;
+            gap: 0.1rem;
         }
 
         nav ul li {
             position: relative;
-            margin: 0 0.5rem;
         }
 
         nav ul li a {
@@ -91,9 +94,13 @@
             text-decoration: none;
             padding: 0.5rem 0.75rem;
             font-weight: 500;
+            font-size: 0.88rem;
             transition: var(--transition);
-            display: block;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
             border-radius: 4px;
+            white-space: nowrap;
         }
 
         nav ul li a:hover {
@@ -120,7 +127,8 @@
         .user-menu {
             display: flex;
             align-items: center;
-            gap: 1rem;
+            gap: 0.75rem;
+            flex-shrink: 0;
         }
 
         .user-greeting {
@@ -132,6 +140,7 @@
                 display: block;
                 font-size: 0.85rem;
                 color: var(--gray);
+                white-space: nowrap;
             }
         }
 
@@ -146,8 +155,11 @@
             font-weight: 500;
             transition: var(--transition);
             text-decoration: none;
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
             font-size: 0.9rem;
+            white-space: nowrap;
         }
 
         .btn:hover {
@@ -168,8 +180,8 @@
         }
 
         .btn-sm {
-            padding: 0.25rem 0.75rem;
-            font-size: 0.85rem;
+            padding: 0.35rem 0.85rem;
+            font-size: 0.82rem;
         }
 
         /* Mobile Navigation */
@@ -190,6 +202,7 @@
             nav ul {
                 position: absolute;
                 flex-direction: column;
+                align-items: flex-start;
                 background-color: white;
                 width: 100%;
                 left: 0;
@@ -199,6 +212,9 @@
                 transform: translateY(-150%);
                 transition: transform 0.3s ease;
                 opacity: 0;
+                justify-content: flex-start;
+                flex: unset;
+                gap: 0;
             }
 
             nav ul.active {
@@ -207,7 +223,8 @@
             }
 
             nav ul li {
-                margin: 0.5rem 0;
+                width: 100%;
+                margin: 0.25rem 0;
             }
 
             .user-menu {
@@ -392,7 +409,7 @@
     <header>
         <nav>
             <a href="{% url 'home' %}" class="logo animate-fade-in">
-                <i class="fas fa-utensils"></i> Recipe Recommender
+                <i class="fas fa-utensils"></i>AI Recipe
             </a>
             
             <button class="mobile-toggle" id="mobileToggle">
@@ -406,7 +423,6 @@
                 <li><a href="{% url 'explore' %}">Explore</a></li>
                 <li><a href="{% url 'meal_planner' %}"><i class="fas fa-calendar-alt"></i> Meal Plan</a></li>
                 <li><a href="{% url 'favorites' %}"><i class="fas fa-heart"></i> Favorites</a></li>
-                
             </ul>
             
             <div class="user-menu">
@@ -415,7 +431,7 @@
                     <a href="{% url 'user_profile' %}" class="btn btn-outline btn-sm animate-fade-in">
                         <i class="fas fa-user"></i> Profile
                     </a>
-                    <form action="{% url 'logout' %}" method="POST" class="animate-fade-in">
+                    <form action="{% url 'logout' %}" method="POST" class="animate-fade-in" style="display:flex; align-items:center;">
                         {% csrf_token %}
                         <button type="submit" class="btn btn-sm">
                             <i class="fas fa-sign-out-alt"></i> Logout
@@ -479,20 +495,17 @@
         </div>
         
         <div class="copyright">
-            <p>&copy; 2025 Recipe Recommender. All Rights Reserved.</p>
+            <p>&copy; 2026 Recipe Recommender. All Rights Reserved.</p>
         </div>
     </footer>
 
     <script>
-        // Mobile Navigation Toggle
         document.addEventListener('DOMContentLoaded', function() {
             const mobileToggle = document.getElementById('mobileToggle');
             const navMenu = document.getElementById('navMenu');
             
             mobileToggle.addEventListener('click', function() {
                 navMenu.classList.toggle('active');
-                
-                // Change icon based on menu state
                 const icon = mobileToggle.querySelector('i');
                 if (navMenu.classList.contains('active')) {
                     icon.classList.remove('fa-bars');
@@ -503,7 +516,6 @@
                 }
             });
             
-            // Close menu when clicking outside
             document.addEventListener('click', function(event) {
                 if (!navMenu.contains(event.target) && !mobileToggle.contains(event.target) && navMenu.classList.contains('active')) {
                     navMenu.classList.remove('active');
@@ -513,7 +525,6 @@
                 }
             });
 
-            // Add active class to current page in navigation
             const currentLocation = window.location.pathname;
             const navLinks = document.querySelectorAll('nav ul li a');
             
@@ -526,24 +537,18 @@
                 }
             });
             
-            // Animate elements when they come into view
             const animateOnScroll = function() {
                 const elements = document.querySelectorAll('.card, .form-group, .grid > *');
-                
                 elements.forEach(element => {
                     const elementPosition = element.getBoundingClientRect().top;
                     const windowHeight = window.innerHeight;
-                    
                     if (elementPosition < windowHeight - 50) {
                         element.classList.add('animate-fade-in');
                     }
                 });
             };
             
-            // Run on load
             animateOnScroll();
-            
-            // Run on scroll
             window.addEventListener('scroll', animateOnScroll);
         });
     </script>
