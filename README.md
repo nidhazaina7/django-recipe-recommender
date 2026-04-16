@@ -1,6 +1,6 @@
 # 🍽️ AI-Powered Recipe Recommender
 
-A full-stack Django-based web application that recommends recipes based on user mood and available ingredients using AI techniques.
+An AI-powered recipe recommendation system built with Django that suggests recipes based on user mood and ingredients.
 
 ---
 
