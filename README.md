@@ -31,3 +31,22 @@ git clone https://github.com/nidhazaina7/AI-Recipe-Recommendation.git
 cd AI-Recipe-Recommendation
 pip install -r requirements.txt
 python manage.py runserver
+
+---
+
+## 📸 Screenshots
+
+### 🏠 Home Page
+![Home](screenshots/home.png)
+
+### 🔍 Explore Recipes
+![Explore](screenshots/explore.png)
+
+### 📅 Meal Planner
+![Meal Plan](screenshots/meal_plan.png)
+
+### 👤 Profile Page
+![Profile](screenshots/Profile.png)
+
+### 🤖 AI Recommendation
+![AI](screenshots/AI_Recommender.png)
