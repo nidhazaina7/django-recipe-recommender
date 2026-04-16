@@ -27,12 +27,11 @@ A full-stack Django-based web application that recommends recipes based on user 
 ## ⚙️ Installation
 
 ```bash
-git clone https://github.com/nidhazaina7/AI-Recipe-Recommendation.git
-cd AI-Recipe-Recommendation
+git clone https://github.com/nidhazaina7/django-recipe-recommender.git
+cd django-recipe-recommender
 pip install -r requirements.txt
 python manage.py runserver
-
----
+```
 
 ## 📸 Screenshots
 
